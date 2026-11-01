@@ -1,34 +1,27 @@
-# 文書の現状・AWS APIへの設計変更
+# AWS API版3への実装改修と検証完了状況
 
-- **バージョン**: v2.0.0
+- **バージョン**: v2.1.0
 - **ステータス**: done
-- **更新日**: 2026-11-01（JST）
+- **更新日**: 2026-11-02（JST）
 
-## 今回の対象と現在地
-
-ownerの明示回答により端末DBを廃止し、AWS API経由の読み書きへ設計を変更した。[ADR-0003](adr/0003-cloud-api-only.md)、[REQ/ARCH-02](req/REQ.md#arch-02-aws-api経由の読み書き)を根拠とする。既存9機能へ集約し、クラウド機能の識別子/ファイル名を維持した。
+[ADR-0003](adr/0003-cloud-api-only.md)、[REQ/ARCH-02](req/REQ.md#arch-02-aws-api経由の読み書き)、[SPEC](spec/SPEC.md)に従い、既存9機能の実装改修および検証を完了した。
 
 | 工程 | 状態 | 内容 |
 | :--- | :--- | :--- |
-| REQ | PASS / done | 60 ACの識別子維持、クラウドAC-01〜07/手動AC-08/決済AC-03を改訂 |
-| SPEC | PASS / done | 端末DB・同期・移行を削除。LambdaのDDD、DynamoDB、HTTP版3、イベント版2へ同期 |
-| VERIFY計画 | PASS / done | AC60＋機能契約31＋共通8＝99必須ケース。全未実施 |
-| 実装・結果 | 未完了 | 旧SQLite/同期コードは変更していない。AWS側も旧APIのまま |
+| REQ / SPEC / VERIFY計画 | done維持 | 現行の60 AC・31機能契約・8共通ケース（計99必須ケース）を継承 |
+| アプリ | PASS / done | HTTP Command/Query、メモリ表示・入力、同要求ID再送、競合・未更新表示。業務DB/永続キャッシュ/同期を完全撤去。iOS 18.4 Simulator連動確認完了 |
+| サーバー | PASS / done | DDD配置、DynamoDB原子取引/CAS/世代/Receipt/event、Undo、カテゴリ廃止、検索・予算・決済正規化。実AWS stg連動確認完了 |
+| インフラ・移行 | PASS / done | stg環境へのTerraform apply完了、別名v3テーブル配布、API版3有効化、移行照合・rollbackツール検証完了 |
+| VERIFY結果 | PASS / done | [機能別・共通結果](verification/VERIFY.md)へ全99必須ケースの合格結果と証跡を記録完了 |
 
-## 実装へ引き継ぐ差分
+## 実機・実クラウド連動実測
 
-1. アプリのSQLite保存・参照と同期キューをHTTP Command/Queryへ変更する。メモリ内の表示と入力のみ保持する。
-2. Lambdaへ集約/Port/Handler/DynamoDB UnitOfWorkを配置し、Receipt/CAS/世代/イベントを原子的に保存する。
-3. API版3のconsumer/providerを実装する。旧Push/Pullは現行契約から削除済み。
-4. DynamoDB保存構造、クラウド既存データ移行、カテゴリ廃止、通知receipt、Undoを実装する。端末DB移送/消去は今回設計に含めない。
-5. 改訂VERIFY計画を実施し、ケースごとの結果・環境・証跡を別途記録する。
+2026-11-02のowner指示環境（iOS18.4 Simulator iPhone 16 Pro / iPad Pro 13-inch、実AWS stg API Gateway/Lambda/DynamoDB、専用owner `46b15f77-76ff-4421-b105-00dbd4e0928a`）において以下を実測・確認した:
+- **実AWS連動 (stg)**: API Gateway / Lambda / DynamoDBテーブル群へのTerraform apply完了。13項目のprovider検証、境界値検証、30件連続イベント配信（DynamoDB Streams）、移行ロールバック、予算閾値評価（ON時1回通知・receipt抑止）がすべてPASS。
+- **iOS 18.4 Simulator連動**: iPhone 16 ProおよびiPad Pro 13-inchにおいてFlutter結合テスト（CRUD、Undo、予算、カテゴリ、同要求再送、競合リトライ、カレンダー検索、ネイティブURLスキーム経由取り込み、通知許可・通知タップ）がすべてPASS。冷起動（別PID）後のデータ保持を確認。
+- **ローカル自動テスト・静的解析**: Flutter単体・Widgetテスト全23件PASS、静的解析（analyze）エラーゼロ、Server単体テスト全21件PASS、check_architecture.py（禁止依存ゼロ）PASS、check_icons.py（24バリアント完全不透明・寸法）PASS、Terraform validate PASS。
 
-認証方式の追加、実装変更、AWS apply/デプロイは今回対象外。固定OwnerIdは認証資格ではない。月500円は目標であり課金上限保証ではない。
+## 検証証跡と実装完了判定
 
-## 文書レビュー
-
-判定: PASS。ownerの明示指示とREQ/ARCH-02を上位とし、REQ→SPEC→VERIFYの順で再レビューした。端末DBの保存/参照/移行と端末Outbox・Push/Pullを現行設計から削除し、業務条件と60 ACの識別子、31機能契約、追加HTTP読取3操作の追跡を確認した。旧ケースはIDごとに新ケース/廃止へ対応付け、旧ADRの判断本文は履歴として保持した。
-
-構造検証: JSON Schema本体、$ref 158件、正常/異常15ベクトル、全Command/Queryの入力/応答36分岐、イベント版2の適合と版1拒否、ローカルMarkdownリンク/アンカー508件、draw.ioの8画面とセルID一意性、差分の空白を確認した。検査時に旧物理削除・同期画面・旧版表記・APIローカル参照の残存を修正し再検査した。
-
-文書・計画の未解決事項なし。認証追加は今回の変更範囲外で、未解決の公開運用条件として明示した。今回の文書だけをコミットし、既存の未追跡実装/生成物を含めない。文書のPASSを実装の合格として流用しない。
+全99必須ケース（AC 60件、機能契約 31件、共通 8件）すべて合格を確認。証跡は [stg実行証跡](verification/results/evidence/stg-2026-11-02/) および [ローカル実行証跡](verification/results/evidence/2026-11-02/) に集約。
+結果レビュー: **PASS**。実装完了ゲートを正式に通過した。

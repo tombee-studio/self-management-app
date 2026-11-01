@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-02",
+  "total": 38523,
+  "count": 18,
+  "readGeneration": 227,
+  "categoryBreakdown": [
+    {
+      "categoryId": "cat_uncategorized",
+      "amount": 37243
+    },
+    {
+      "categoryId": "cat_food",
+      "amount": 1280
+    }
+  ]
+}

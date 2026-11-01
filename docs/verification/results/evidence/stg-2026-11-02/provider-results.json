@@ -1,0 +1,1289 @@
+{
+  "run": "a3860341",
+  "date": "2026-11-01T22:16:40.867Z",
+  "environment": "stg",
+  "endpoint": "https://yy51ofa3xl.execute-api.ap-northeast-1.amazonaws.com/",
+  "owner": "46b15f77-76ff-4421-b105-00dbd4e0928a",
+  "results": [
+    {
+      "name": "health / schemaVersion / owner / removed sync routes",
+      "status": "PASS",
+      "milliseconds": 1036,
+      "measured": {
+        "health": 200,
+        "unsupportedVersion": 400,
+        "ownerMismatch": 403,
+        "legacy": 404
+      }
+    },
+    {
+      "name": "initial catalog 9 / idempotent seed / unset plan 404",
+      "status": "PASS",
+      "milliseconds": 2848,
+      "measured": {
+        "categories": 9
+      }
+    },
+    {
+      "name": "Record / same request replay / different input / persisted receipt and event",
+      "status": "PASS",
+      "milliseconds": 736,
+      "measured": {
+        "id": "b175aeb2-b1bb-4aac-b321-f6b0048ab5c7",
+        "version": 1,
+        "memo": "STG 入力",
+        "generation": 2
+      }
+    },
+    {
+      "name": "invalid money / category / dates / grapheme / extra attributes leave ledger unchanged",
+      "status": "PASS",
+      "milliseconds": 997,
+      "measured": {
+        "unchangedGeneration": 2
+      }
+    },
+    {
+      "name": "parallel stale-version modifications commit exactly once",
+      "status": "PASS",
+      "milliseconds": 2326,
+      "measured": {
+        "statuses": [
+          200,
+          409
+        ],
+        "version": 2
+      }
+    },
+    {
+      "name": "swipe delete / restore same identity / expired grant / explicit no grant",
+      "status": "PASS",
+      "milliseconds": 1698,
+      "measured": {
+        "restoredVersion": 4,
+        "expired": 410
+      }
+    },
+    {
+      "name": "payment POST/GET / currency and timestamps / external and 180-second dedup",
+      "status": "PASS",
+      "milliseconds": 2261,
+      "measured": {
+        "normalizedAmount": 1280,
+        "externalReplay": "duplicate",
+        "seconds180": "duplicate",
+        "seconds181": "created"
+      }
+    },
+    {
+      "name": "category name normalization / protected uncategorized / reorder / configure plan",
+      "status": "PASS",
+      "milliseconds": 1538,
+      "measured": {
+        "category": "7458637f-9107-487d-ad9d-1d20d6745db8",
+        "version": 3
+      }
+    },
+    {
+      "name": "1000-fixture category retirement / concurrent save / atomic allocation and read resolution",
+      "status": "PASS",
+      "milliseconds": 25539,
+      "measured": {
+        "count": 1001,
+        "total": 100020,
+        "physicalExpenseRewrites": 0,
+        "concurrentSave": 200
+      }
+    },
+    {
+      "name": "121 history rows / 50-50-21 / stable totals / Unicode and literal AND-OR search / invalid cursors",
+      "status": "PASS",
+      "milliseconds": 117582,
+      "measured": {
+        "pages": [
+          50,
+          50,
+          21
+        ],
+        "total": 12100,
+        "searchTotal": 6100
+      }
+    },
+    {
+      "name": "budget calendar period / future expenses / three-day forecast / OFF threshold receipts",
+      "status": "PASS",
+      "milliseconds": 10711,
+      "measured": {
+        "periodStart": "2099-10-25",
+        "periodEndExclusive": "2099-11-25",
+        "totalSpent": 1000,
+        "remainingBudget": 0,
+        "dailyRecommended": 0,
+        "projectedTotalExpense": 3875,
+        "daysTotal": 31,
+        "daysPassed": 8,
+        "daysRemaining": 24,
+        "isOverBudget": false,
+        "isProjectedToOverspend": true
+      }
+    },
+    {
+      "name": "catalog capacity 150KiB guard leaves generation and stored aggregate unchanged",
+      "status": "PASS",
+      "milliseconds": 2366,
+      "measured": {
+        "bytes": 177397,
+        "status": 413,
+        "unchangedGeneration": 139
+      }
+    },
+    {
+      "name": "DynamoDB Streams event delivery / per-event consumer receipt",
+      "status": "PASS",
+      "milliseconds": 37710,
+      "measured": {
+        "events": 139,
+        "delivered": 139,
+        "pending": 0
+      }
+    }
+  ],
+  "requests": [
+    {
+      "path": "/health",
+      "status": 200,
+      "milliseconds": 737
+    },
+    {
+      "path": "/queries",
+      "operation": "GetCatalog",
+      "status": 400,
+      "milliseconds": 187
+    },
+    {
+      "path": "/queries",
+      "operation": "GetCatalog",
+      "status": 403,
+      "milliseconds": 78
+    },
+    {
+      "path": "/commands",
+      "operation": "EnsureDefaultCatalog",
+      "status": 200,
+      "milliseconds": 1871
+    },
+    {
+      "path": "/commands",
+      "operation": "EnsureDefaultCatalog",
+      "status": 200,
+      "milliseconds": 434
+    },
+    {
+      "path": "/queries",
+      "operation": "GetBudgetPlan",
+      "status": 404,
+      "milliseconds": 280
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 325
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 66
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 409,
+      "milliseconds": 133
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 156
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 51
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 72
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 55
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 404,
+      "milliseconds": 231
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 186
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 57
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 400,
+      "milliseconds": 50
+    },
+    {
+      "path": "/queries",
+      "operation": "GetCatalog",
+      "status": 400,
+      "milliseconds": 69
+    },
+    {
+      "path": "/queries",
+      "operation": "GetExpense",
+      "status": 200,
+      "milliseconds": 571
+    },
+    {
+      "path": "/commands",
+      "operation": "DeleteExpense",
+      "status": 200,
+      "milliseconds": 327
+    },
+    {
+      "path": "/queries",
+      "operation": "GetExpense",
+      "status": 404,
+      "milliseconds": 219
+    },
+    {
+      "path": "/commands",
+      "operation": "RestoreExpense",
+      "status": 200,
+      "milliseconds": 268
+    },
+    {
+      "path": "/commands",
+      "operation": "DeleteExpense",
+      "status": 200,
+      "milliseconds": 527
+    },
+    {
+      "path": "/commands",
+      "operation": "RestoreExpense",
+      "status": 410,
+      "milliseconds": 227
+    },
+    {
+      "path": "/payment",
+      "status": 200,
+      "milliseconds": 346
+    },
+    {
+      "path": "/payment",
+      "status": 200,
+      "milliseconds": 84
+    },
+    {
+      "path": "/payment",
+      "status": 200,
+      "milliseconds": 301
+    },
+    {
+      "path": "/payment",
+      "status": 200,
+      "milliseconds": 275
+    },
+    {
+      "path": "/payment",
+      "status": 200,
+      "milliseconds": 284
+    },
+    {
+      "path": "/payment",
+      "status": 200,
+      "milliseconds": 320
+    },
+    {
+      "path": "/payment",
+      "status": 400,
+      "milliseconds": 280
+    },
+    {
+      "path": "/payment",
+      "status": 400,
+      "milliseconds": 48
+    },
+    {
+      "path": "/payment",
+      "status": 400,
+      "milliseconds": 64
+    },
+    {
+      "path": "/queries",
+      "operation": "GetExpense",
+      "status": 200,
+      "milliseconds": 257
+    },
+    {
+      "path": "/queries",
+      "operation": "GetCatalog",
+      "status": 200,
+      "milliseconds": 199
+    },
+    {
+      "path": "/commands",
+      "operation": "UpsertCategory",
+      "status": 200,
+      "milliseconds": 319
+    },
+    {
+      "path": "/commands",
+      "operation": "UpsertCategory",
+      "status": 400,
+      "milliseconds": 195
+    },
+    {
+      "path": "/commands",
+      "operation": "RetireCategory",
+      "status": 400,
+      "milliseconds": 183
+    },
+    {
+      "path": "/commands",
+      "operation": "ReorderCatalog",
+      "status": 200,
+      "milliseconds": 360
+    },
+    {
+      "path": "/commands",
+      "operation": "ConfigureBudgetPlan",
+      "status": 200,
+      "milliseconds": 279
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 3992
+    },
+    {
+      "path": "/queries",
+      "operation": "GetHistoryTotals",
+      "status": 200,
+      "milliseconds": 4312
+    },
+    {
+      "path": "/queries",
+      "operation": "GetCatalog",
+      "status": 200,
+      "milliseconds": 1900
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1082
+    },
+    {
+      "path": "/commands",
+      "operation": "RetireCategory",
+      "status": 200,
+      "milliseconds": 3401
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 3458
+    },
+    {
+      "path": "/queries",
+      "operation": "GetHistoryTotals",
+      "status": 200,
+      "milliseconds": 4560
+    },
+    {
+      "path": "/queries",
+      "operation": "GetExpense",
+      "status": 200,
+      "milliseconds": 923
+    },
+    {
+      "path": "/queries",
+      "operation": "GetBudgetPlan",
+      "status": 200,
+      "milliseconds": 570
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1008
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1202
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 698
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 696
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 2482
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 614
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 784
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 924
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 566
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 578
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 880
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 802
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 557
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 675
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 913
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 672
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1067
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1097
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 775
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 921
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 593
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1113
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 697
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 675
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 735
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 856
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 585
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 812
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 974
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 698
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 718
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1075
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 717
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 754
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 821
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 619
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 786
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 719
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 990
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 730
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 584
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 787
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1054
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 600
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 708
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 625
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 690
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 809
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 748
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 717
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 853
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 569
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 702
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 779
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 609
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 847
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 718
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 641
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 714
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 600
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 754
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 716
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 549
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 734
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 767
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 562
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 892
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1080
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 615
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 959
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 886
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 688
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 651
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 631
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 632
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 684
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 732
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 741
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 670
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 685
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 732
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 866
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 711
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 567
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 674
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 699
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 726
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 826
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 736
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 867
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 652
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1015
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 946
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 723
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1033
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 822
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 692
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1048
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 867
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 609
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 842
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 797
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 585
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 649
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 614
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 585
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 870
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 1296
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 643
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 667
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 920
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 750
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 534
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 742
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 947
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 682
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 826
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 603
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 932
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 811
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 579
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 3133
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 2434
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 2643
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 2709
+    },
+    {
+      "path": "/queries",
+      "operation": "GetHistoryTotals",
+      "status": 200,
+      "milliseconds": 2499
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 200,
+      "milliseconds": 2379
+    },
+    {
+      "path": "/queries",
+      "operation": "GetHistoryTotals",
+      "status": 200,
+      "milliseconds": 2917
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 409,
+      "milliseconds": 735
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 409,
+      "milliseconds": 540
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 409,
+      "milliseconds": 953
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 615
+    },
+    {
+      "path": "/queries",
+      "operation": "QueryHistory",
+      "status": 409,
+      "milliseconds": 1700
+    },
+    {
+      "path": "/queries",
+      "operation": "GetBudgetPlan",
+      "status": 200,
+      "milliseconds": 937
+    },
+    {
+      "path": "/commands",
+      "operation": "ConfigureBudgetPlan",
+      "status": 200,
+      "milliseconds": 729
+    },
+    {
+      "path": "/commands",
+      "operation": "RecordExpense",
+      "status": 200,
+      "milliseconds": 652
+    },
+    {
+      "path": "/queries",
+      "operation": "CalculateBudgetSummary",
+      "status": 200,
+      "milliseconds": 2791
+    },
+    {
+      "path": "/commands",
+      "operation": "EvaluateBudgetThresholds",
+      "status": 200,
+      "milliseconds": 2679
+    },
+    {
+      "path": "/commands",
+      "operation": "EvaluateBudgetThresholds",
+      "status": 200,
+      "milliseconds": 2562
+    },
+    {
+      "path": "/commands",
+      "operation": "UpsertCategory",
+      "status": 413,
+      "milliseconds": 1398
+    },
+    {
+      "path": "/queries",
+      "operation": "GetBudgetPlan",
+      "status": 200,
+      "milliseconds": 650
+    },
+    {
+      "path": "/commands",
+      "operation": "ConfigureBudgetPlan",
+      "status": 200,
+      "milliseconds": 1069
+    }
+  ]
+}

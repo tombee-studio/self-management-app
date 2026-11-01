@@ -1,0 +1,1 @@
+PASS: real AWS migration, lost-response rollback, and cancelled transaction preserve state/version/generation/receipt/events

@@ -1,14 +1,14 @@
 # Layer 3: 検証インデックス
 
-- **バージョン**: v2.0.0
+- **バージョン**: v2.1.0
 - **ステータス**: done
-- **更新日**: 2026-11-01（JST）
+- **更新日**: 2026-11-02（JST）
 
 ## 共通条件
 
 [REQ](../req/REQ.md)、[SPEC](../spec/SPEC.md)、[ADR-0003](../adr/0003-cloud-api-only.md)に従う。全9機能のACと契約を対象とする。計画doneは実施結果PASSではない。端末DB参照/移行/同期を検証対象から除き、HTTP consumer/providerとLambda/DynamoDBの保存・取得を確認する。
 
-固定時計2026-11-01、Asia/Tokyoと夏時間地域、隔離owner、メモリUI状態、HTTP/通知fake、DynamoDBテスト環境を使う。実機はiOS16以降/Android12以降、代表幅320/600/900。
+固定時計のローカル検証に加え、2026-11-02のowner指示に従い、OS連動はiOS18.4 Simulator、実AWSは独立Terraform stateのstgと検証専用ownerを使う。実時計と固定入力日時を区別し、代表幅320/600/900・iPadも対象とする。Android・実Wallet決済・物理ロック画面・月額実請求は未測定事項として分ける。
 
 ## 機能別計画
 
@@ -41,7 +41,24 @@
 
 ## 結果・証跡
 
-全9機能・共通ケースは未実施、結果文書未作成。実装後にresults/<機能名>.mdへケース別実測・対象・環境・証跡を記録する。既存自動テストや文書Schema検証だけで実装完了としない。[現状](../STATUS.md)を参照。
+2026-11-02のowner指示環境（iOS18.4 Simulator iPhone 16 Pro / iPad Pro 13-inch、実AWS stg API Gateway/Lambda/DynamoDB、専用owner `46b15f77-76ff-4421-b105-00dbd4e0928a`）において全99必須ケースの検証を実施・完了した。
+
+| 対象 | 結果 | 状態 |
+| :--- | :--- | :--- |
+| app-icon-branding | [結果](results/app-icon-branding.md) | done |
+| aws-cloud-database-sync | [結果](results/aws-cloud-database-sync.md) | done |
+| budget-management | [結果](results/budget-management.md) | done |
+| category-master-management | [結果](results/category-master-management.md) | done |
+| cross-platform-shared-ui | [結果](results/cross-platform-shared-ui.md) | done |
+| daily-expense-dashboard | [結果](results/daily-expense-dashboard.md) | done |
+| expense-history-list | [結果](results/expense-history-list.md) | done |
+| manual-expense-crud | [結果](results/manual-expense-crud.md) | done |
+| payment-event-ingestion | [結果](results/payment-event-ingestion.md) | done |
+| ARCH-02共通 | [結果](results/architecture.md) | done |
+
+実AWS stg実行証跡は [stg実行証跡](results/evidence/stg-2026-11-02/)、ローカルテスト・解析ログとソースmanifestは [ローカル実行証跡](results/evidence/2026-11-02/) に記録されている。全99必須ケース合格を確認。
+
+結果レビュー: **PASS**。実装完了ゲートを通過。
 
 ## 旧共通ケースとの対応
 

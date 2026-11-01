@@ -1,0 +1,2 @@
+PASS: no device DB/sync, Domain dependency violations, or server contract drift
+PASS: 24 icon variants, dimensions/references/opacity; installed visual review remains required

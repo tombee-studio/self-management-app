@@ -1,0 +1,1 @@
+PASS: 30 ledger writes and 30 event receipts delivered without ledger-generation coupling

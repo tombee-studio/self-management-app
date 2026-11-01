@@ -1,0 +1,12 @@
+Test Suite 'Selected tests' started at 2026-11-02 07:54:23.695.
+Test Suite 'NativeUI.xctest' started at 2026-11-02 07:54:23.696.
+Test Suite 'NativeUI' started at 2026-11-02 07:54:23.696.
+Test Case '-[NativeUI.NativeUI testAcceptOpenURLAndNotification]' started.
+Test Case '-[NativeUI.NativeUI testAcceptOpenURLAndNotification]' passed (13.764 seconds).
+Test Suite 'NativeUI' passed at 2026-11-02 07:54:37.461.
+	 Executed 1 test, with 0 failures (0 unexpected) in 13.764 (13.765) seconds
+Test Suite 'NativeUI.xctest' passed at 2026-11-02 07:54:37.462.
+	 Executed 1 test, with 0 failures (0 unexpected) in 13.764 (13.766) seconds
+Test Suite 'Selected tests' passed at 2026-11-02 07:54:37.463.
+	 Executed 1 test, with 0 failures (0 unexpected) in 13.764 (13.767) seconds
+** TEST EXECUTE SUCCEEDED **

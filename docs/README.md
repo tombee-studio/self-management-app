@@ -1,10 +1,10 @@
 # ドキュメント案内
 
-- **バージョン**: v2.0.0
+- **バージョン**: v2.1.0
 - **ステータス**: done
-- **更新日**: 2026-11-01（JST）
+- **更新日**: 2026-11-02（JST）
 
-iris 支出管理の全9機能について、要求・設計・画面仕様・検証計画を管理する。対象範囲は[ADR-0001](adr/0001-nine-feature-scope.md)を参照する。文書のdoneはレビュー完了を表し、アプリの実装・検証完了を意味しない。
+iris 支出管理の全9機能について、要求・設計・画面仕様・検証計画・検証結果を管理する。対象範囲は[ADR-0001](adr/0001-nine-feature-scope.md)を参照する。
 
 | 読む目的 | 正本・参照先 |
 | :--- | :--- |
@@ -16,7 +16,7 @@ iris 支出管理の全9機能について、要求・設計・画面仕様・�
 | 画面とコンポーネント仕様 | [screens.drawio](spec/screens.drawio)（SCR-001〜008） |
 | ケース・合否基準・実施結果の入口 | [Layer 3 VERIFY](verification/VERIFY.md) |
 | 対象範囲などの横断判断 | [ADR一覧](adr/ADR.md) |
-| レビュー結果とコードの未対応箇所 | [STATUS](STATUS.md) |
+| レビュー結果と実装・検証進捗 | [STATUS](STATUS.md) |
 
 参照優先順位は運用 → REQ → SPEC → VERIFY。実装は設計に追従させる。レガシー資料と互換案内は削除済み。以前の版が必要な場合はGit履歴（`9f30200`）を参照する。
 
@@ -24,8 +24,8 @@ iris 支出管理の全9機能について、要求・設計・画面仕様・�
 
 過去の無料枠・料金試算・実装済み表記を現行の確定条件や検証合格として扱わない。関連Issueは[支出管理機能を追加する #1](https://github.com/tombee-studio/self-management-app/issues/1)。
 
-全9機能をDDD＋契約駆動で設計し、操作契約31件・HTTP読取補助3件を定義する。HTTP版3・内部イベント版2・操作契約版2を管理し、[ADR-0003](adr/0003-cloud-api-only.md)と99件の検証計画へ対応付ける。途中実装は未適合。
+全9機能をDDD＋契約駆動で設計し、操作契約31件・HTTP読取補助3件を定義する。HTTP版3・内部イベント版2・操作契約版2を管理し、[ADR-0003](adr/0003-cloud-api-only.md)と99件の検証計画へ対応付ける。実装はAPI版3へ改修済み。実機シミュレータおよび実AWS stg環境での全99必須ケースの検証を完了し、STATUS・VERIFY結果にて全件合格（PASS）を記録している。
 
 ## AWS APIへの保存方式変更
 
-[ADR-0003](adr/0003-cloud-api-only.md)により端末DBを廃止。アプリはAPI Gateway/Lambda経由でDynamoDBを読み書きする。API版3の設計は[SPEC](spec/SPEC.md)、検証計画は[VERIFY](verification/VERIFY.md)。既存実装は旧方式であり未適合。
+[ADR-0003](adr/0003-cloud-api-only.md)により端末DBを廃止。アプリはAPI Gateway/Lambda経由でDynamoDBを読み書きする。API版3の設計は[SPEC](spec/SPEC.md)、検証計画および検証結果は[VERIFY](verification/VERIFY.md)。アプリ・サーバー・インフラは新方式へ改修し、実AWS stg環境およびiOS 18.4 Simulator環境での検証を完了した。

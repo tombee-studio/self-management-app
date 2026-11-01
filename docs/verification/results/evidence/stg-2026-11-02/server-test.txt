@@ -1,0 +1,33 @@
+
+> iris-api@3.0.0 test
+> node --test test/*.test.js
+
+✔ commands enforce money, normalization, versions, immutable origin, rollback and receipts (15.290833ms)
+✔ commit followed by lost response replays original response without duplicate state (0.50225ms)
+✔ Undo uses commit deadline, same ID/content, single grant, and receipt before expiry (1.20625ms)
+✔ catalog uniqueness, protected default, complete reorder and retirement of 1000 expenses with budget (96.551125ms)
+✔ history 50/50/21, all-page totals, signed owner/filter/generation/expiry constraints and query purity (95.350875ms)
+✔ budget calendar math, future expenses, warning delay, allocations, thresholds OFF receipts (1.251167ms)
+✔ payment canonical source, normalization, exact ID and inclusive 180-second fallback, concurrent race (2.688125ms)
+✔ HTTP provider verifies owner, envelope, extra fields, no legacy endpoints and read types (0.786959ms)
+✔ query retries generation drift twice and returns Busy instead of mixed results (0.323125ms)
+✔ Unicode literal AND/OR/source filters preserve unfiltered month total and local day totals (1.1655ms)
+✔ all generated consumer/provider fixtures and stored events conform to canonical schemas (2.747166ms)
+✔ notification receipt does not invalidate a ledger read snapshot (0.740959ms)
+✔ provider puts generation, aggregate, receipt and events in one conditional transaction (4.054542ms)
+✔ retirement transaction stays fixed for 1000 items, protects budget and catalog and never rewrites expenses (2.094125ms)
+✔ provider rejects catalog/plan over 150KiB without issuing a transaction (0.960709ms)
+✔ provider traverses every strongly consistent Query page and honors deadline (0.36875ms)
+✔ event delivery is atomic and does not read or CAS unrelated ledger/catalog state (0.171ms)
+✔ event v2 consumer commits effects/receipt/delivery atomically and rejects v1 (1.588667ms)
+✔ cloud import verifies totals and rolls back all target rows after an unknown transaction outcome (11.612708ms)
+✔ cloud-only migration preserves IDs/count/money, repairs name collisions and leaves backup unchanged (15.25375ms)
+✔ Lambda stream adapter acknowledges committed v2 events once and ignores delivery updates (7.577917ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 289.814583
