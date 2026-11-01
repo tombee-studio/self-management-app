@@ -1,0 +1,880 @@
+[
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "EnsureDefaultCatalog",
+      "input": {},
+      "requestId": "6cf7bd79-1f47-4364-8bea-6df74108894b"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "EnsureDefaultCatalog",
+      "requestId": "6cf7bd79-1f47-4364-8bea-6df74108894b",
+      "value": {
+        "version": 1,
+        "categories": [
+          {
+            "id": "cat_food",
+            "name": "食費",
+            "iconKey": "restaurant",
+            "colorHex": "#F97316",
+            "sortOrder": 0,
+            "isSystem": false
+          },
+          {
+            "id": "cat_daily",
+            "name": "日用品",
+            "iconKey": "shopping_bag",
+            "colorHex": "#14B8A6",
+            "sortOrder": 1,
+            "isSystem": false
+          },
+          {
+            "id": "cat_transport",
+            "name": "交通費",
+            "iconKey": "train",
+            "colorHex": "#3B82F6",
+            "sortOrder": 2,
+            "isSystem": false
+          },
+          {
+            "id": "cat_cafe",
+            "name": "カフェ・外食",
+            "iconKey": "local_cafe",
+            "colorHex": "#A16207",
+            "sortOrder": 3,
+            "isSystem": false
+          },
+          {
+            "id": "cat_clothing",
+            "name": "衣服・美容",
+            "iconKey": "checkroom",
+            "colorHex": "#EC4899",
+            "sortOrder": 4,
+            "isSystem": false
+          },
+          {
+            "id": "cat_medical",
+            "name": "医療・健康",
+            "iconKey": "medical_services",
+            "colorHex": "#EF4444",
+            "sortOrder": 5,
+            "isSystem": false
+          },
+          {
+            "id": "cat_entertainment",
+            "name": "趣味・娯楽",
+            "iconKey": "sports_esports",
+            "colorHex": "#8B5CF6",
+            "sortOrder": 6,
+            "isSystem": false
+          },
+          {
+            "id": "cat_home",
+            "name": "住まい・通信",
+            "iconKey": "home",
+            "colorHex": "#6366F1",
+            "sortOrder": 7,
+            "isSystem": false
+          },
+          {
+            "id": "cat_uncategorized",
+            "name": "未分類",
+            "iconKey": "folder",
+            "colorHex": "#94A3B8",
+            "sortOrder": 8,
+            "isSystem": true
+          }
+        ]
+      },
+      "warnings": [],
+      "readGeneration": 1
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "GetCatalog",
+      "input": {}
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "GetCatalog",
+      "value": {
+        "version": 1,
+        "categories": [
+          {
+            "id": "cat_food",
+            "name": "食費",
+            "iconKey": "restaurant",
+            "colorHex": "#F97316",
+            "sortOrder": 0,
+            "isSystem": false
+          },
+          {
+            "id": "cat_daily",
+            "name": "日用品",
+            "iconKey": "shopping_bag",
+            "colorHex": "#14B8A6",
+            "sortOrder": 1,
+            "isSystem": false
+          },
+          {
+            "id": "cat_transport",
+            "name": "交通費",
+            "iconKey": "train",
+            "colorHex": "#3B82F6",
+            "sortOrder": 2,
+            "isSystem": false
+          },
+          {
+            "id": "cat_cafe",
+            "name": "カフェ・外食",
+            "iconKey": "local_cafe",
+            "colorHex": "#A16207",
+            "sortOrder": 3,
+            "isSystem": false
+          },
+          {
+            "id": "cat_clothing",
+            "name": "衣服・美容",
+            "iconKey": "checkroom",
+            "colorHex": "#EC4899",
+            "sortOrder": 4,
+            "isSystem": false
+          },
+          {
+            "id": "cat_medical",
+            "name": "医療・健康",
+            "iconKey": "medical_services",
+            "colorHex": "#EF4444",
+            "sortOrder": 5,
+            "isSystem": false
+          },
+          {
+            "id": "cat_entertainment",
+            "name": "趣味・娯楽",
+            "iconKey": "sports_esports",
+            "colorHex": "#8B5CF6",
+            "sortOrder": 6,
+            "isSystem": false
+          },
+          {
+            "id": "cat_home",
+            "name": "住まい・通信",
+            "iconKey": "home",
+            "colorHex": "#6366F1",
+            "sortOrder": 7,
+            "isSystem": false
+          },
+          {
+            "id": "cat_uncategorized",
+            "name": "未分類",
+            "iconKey": "folder",
+            "colorHex": "#94A3B8",
+            "sortOrder": 8,
+            "isSystem": true
+          }
+        ]
+      },
+      "warnings": [],
+      "readGeneration": 1
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "RecordExpense",
+      "input": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "amount": 1280,
+        "categoryId": "cat_food",
+        "spentAt": "2026-11-01T03:00:00.000Z",
+        "paymentMethod": "cash",
+        "memo": "ランチ"
+      },
+      "requestId": "00cbc01a-69e6-4b52-9533-538c4d745769"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "RecordExpense",
+      "requestId": "00cbc01a-69e6-4b52-9533-538c4d745769",
+      "value": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "amount": 1280,
+        "categoryId": "cat_food",
+        "spentAt": "2026-11-01T03:00:00.000Z",
+        "paymentMethod": "cash",
+        "memo": "ランチ",
+        "source": "manual",
+        "externalTxId": null,
+        "version": 1
+      },
+      "warnings": [],
+      "readGeneration": 2
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "GetExpense",
+      "input": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa"
+      }
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "GetExpense",
+      "value": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "amount": 1280,
+        "categoryId": "cat_food",
+        "spentAt": "2026-11-01T03:00:00.000Z",
+        "paymentMethod": "cash",
+        "memo": "ランチ",
+        "source": "manual",
+        "externalTxId": null,
+        "version": 1
+      },
+      "warnings": [],
+      "readGeneration": 2
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "ModifyExpense",
+      "input": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "expectedVersion": 1,
+        "changes": {
+          "memo": "昼食"
+        }
+      },
+      "requestId": "4c1ac155-7a2b-4ca8-8300-0f0fc77604d3"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "ModifyExpense",
+      "requestId": "4c1ac155-7a2b-4ca8-8300-0f0fc77604d3",
+      "value": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "amount": 1280,
+        "categoryId": "cat_food",
+        "spentAt": "2026-11-01T03:00:00.000Z",
+        "paymentMethod": "cash",
+        "memo": "昼食",
+        "source": "manual",
+        "externalTxId": null,
+        "version": 2
+      },
+      "warnings": [],
+      "readGeneration": 3
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "DeleteExpense",
+      "input": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "expectedVersion": 2,
+        "kind": "swipe"
+      },
+      "requestId": "8272598b-85ea-4dcf-a3c3-728c21ea0783"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "DeleteExpense",
+      "requestId": "8272598b-85ea-4dcf-a3c3-728c21ea0783",
+      "value": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "version": 3,
+        "undoGrant": "a3e3643d-9b3b-4b2d-9ae4-9f9d6c053a0b"
+      },
+      "warnings": [],
+      "readGeneration": 4
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "RestoreExpense",
+      "input": {
+        "grant": "a3e3643d-9b3b-4b2d-9ae4-9f9d6c053a0b"
+      },
+      "requestId": "356256be-6626-44ef-b75b-f6ff7ec997b3"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "RestoreExpense",
+      "requestId": "356256be-6626-44ef-b75b-f6ff7ec997b3",
+      "value": {
+        "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+        "amount": 1280,
+        "categoryId": "cat_food",
+        "spentAt": "2026-11-01T03:00:00.000Z",
+        "paymentMethod": "cash",
+        "memo": "昼食",
+        "source": "manual",
+        "externalTxId": null,
+        "version": 4
+      },
+      "warnings": [],
+      "readGeneration": 5
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "ConfigureBudgetPlan",
+      "input": {
+        "expectedVersion": 0,
+        "monthlyAmount": 100000,
+        "startDay": 1,
+        "allocations": [],
+        "notificationEnabled": true,
+        "categoryBudgetEnabled": false
+      },
+      "requestId": "7688634a-bf55-49ff-a1d0-72105e50c5f4"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "ConfigureBudgetPlan",
+      "requestId": "7688634a-bf55-49ff-a1d0-72105e50c5f4",
+      "value": {
+        "monthlyAmount": 100000,
+        "startDay": 1,
+        "allocations": [],
+        "notificationEnabled": true,
+        "categoryBudgetEnabled": false,
+        "version": 1
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "GetBudgetPlan",
+      "input": {}
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "GetBudgetPlan",
+      "value": {
+        "monthlyAmount": 100000,
+        "startDay": 1,
+        "allocations": [],
+        "notificationEnabled": true,
+        "categoryBudgetEnabled": false,
+        "version": 1
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "WatchDailySummary",
+      "input": {
+        "date": "2026-11-01",
+        "timeZone": "Asia/Tokyo"
+      }
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "WatchDailySummary",
+      "value": {
+        "date": "2026-11-01",
+        "total": 1280,
+        "categoryBreakdown": [
+          {
+            "categoryId": "cat_food",
+            "amount": 1280
+          }
+        ],
+        "items": [
+          {
+            "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+            "amount": 1280,
+            "categoryId": "cat_food",
+            "spentAt": "2026-11-01T03:00:00.000Z",
+            "paymentMethod": "cash",
+            "memo": "昼食",
+            "source": "manual",
+            "externalTxId": null,
+            "version": 4
+          }
+        ],
+        "snapshotId": "eyJvd25lciI6ImZpeHR1cmUiLCJnZW5lcmF0aW9uIjo2LCJmaWx0ZXIiOiIyMDI2LTExLTAxIiwidGltZVpvbmUiOiJBc2lhL1Rva3lvIiwiZXhwaXJlcyI6MTc5MzU3MDY3MTQ3M30.yLs31IjLPUH0j9_G6G7wlUF_hBeL2JmATyB7jJuh2hM",
+        "budgetHint": {
+          "periodStart": "2026-11-01",
+          "periodEndExclusive": "2026-12-01",
+          "totalSpent": 1280,
+          "remainingBudget": 98720,
+          "dailyRecommended": 3290,
+          "projectedTotalExpense": 38400,
+          "daysTotal": 30,
+          "daysPassed": 1,
+          "daysRemaining": 30,
+          "isOverBudget": false,
+          "isProjectedToOverspend": false
+        }
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "RefreshDailyProjection",
+      "input": {
+        "date": "2026-11-01",
+        "timeZone": "Asia/Tokyo"
+      }
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "RefreshDailyProjection",
+      "value": {
+        "date": "2026-11-01",
+        "total": 1280,
+        "categoryBreakdown": [
+          {
+            "categoryId": "cat_food",
+            "amount": 1280
+          }
+        ],
+        "items": [
+          {
+            "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+            "amount": 1280,
+            "categoryId": "cat_food",
+            "spentAt": "2026-11-01T03:00:00.000Z",
+            "paymentMethod": "cash",
+            "memo": "昼食",
+            "source": "manual",
+            "externalTxId": null,
+            "version": 4
+          }
+        ],
+        "snapshotId": "eyJvd25lciI6ImZpeHR1cmUiLCJnZW5lcmF0aW9uIjo2LCJmaWx0ZXIiOiIyMDI2LTExLTAxIiwidGltZVpvbmUiOiJBc2lhL1Rva3lvIiwiZXhwaXJlcyI6MTc5MzU3MDY3MTQ3NH0.YNiNtOp-WzJ3kF1ewCF6-uMyvv8xZWXM_KuHufR0SiA",
+        "budgetHint": {
+          "periodStart": "2026-11-01",
+          "periodEndExclusive": "2026-12-01",
+          "totalSpent": 1280,
+          "remainingBudget": 98720,
+          "dailyRecommended": 3290,
+          "projectedTotalExpense": 38400,
+          "daysTotal": 30,
+          "daysPassed": 1,
+          "daysRemaining": 30,
+          "isOverBudget": false,
+          "isProjectedToOverspend": false
+        }
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "QueryHistory",
+      "input": {
+        "filter": {
+          "month": "2026-11",
+          "keyword": "",
+          "categoryIds": [],
+          "source": null,
+          "timeZone": "Asia/Tokyo"
+        }
+      }
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "QueryHistory",
+      "value": {
+        "items": [
+          {
+            "id": "ac3f31bf-1b5b-4a90-b60c-30dffe9d34aa",
+            "amount": 1280,
+            "categoryId": "cat_food",
+            "spentAt": "2026-11-01T03:00:00.000Z",
+            "paymentMethod": "cash",
+            "memo": "昼食",
+            "source": "manual",
+            "externalTxId": null,
+            "version": 4
+          }
+        ],
+        "nextCursor": null,
+        "snapshotId": "eyJvd25lciI6ImZpeHR1cmUiLCJnZW5lcmF0aW9uIjo2LCJmaWx0ZXIiOiI0MjljMDRmMTJhYzY2NmU3MzMzYjQ3MTQ3NGVjOTI1MDRkODI2ZGM2MWFhOWUwNTMyZWE4NDhjYmU0NjM3NmQ3IiwidGltZVpvbmUiOiJBc2lhL1Rva3lvIiwiZXhwaXJlcyI6MTc5MzU3MDY3MTQ3NH0.5ytqPpFb88f4DTINKp2myrENf69q8dhsAPVLV2vgw8g"
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "GetHistoryTotals",
+      "input": {
+        "filter": {
+          "month": "2026-11",
+          "keyword": "",
+          "categoryIds": [],
+          "source": null,
+          "timeZone": "Asia/Tokyo"
+        },
+        "snapshotId": "eyJvd25lciI6ImZpeHR1cmUiLCJnZW5lcmF0aW9uIjo2LCJmaWx0ZXIiOiI0MjljMDRmMTJhYzY2NmU3MzMzYjQ3MTQ3NGVjOTI1MDRkODI2ZGM2MWFhOWUwNTMyZWE4NDhjYmU0NjM3NmQ3IiwidGltZVpvbmUiOiJBc2lhL1Rva3lvIiwiZXhwaXJlcyI6MTc5MzU3MDY3MTQ3NH0.5ytqPpFb88f4DTINKp2myrENf69q8dhsAPVLV2vgw8g"
+      }
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "GetHistoryTotals",
+      "value": {
+        "count": 1,
+        "total": 1280,
+        "monthTotal": 1280,
+        "dayTotals": [
+          {
+            "date": "2026-11-01",
+            "total": 1280
+          }
+        ],
+        "snapshotId": "eyJvd25lciI6ImZpeHR1cmUiLCJnZW5lcmF0aW9uIjo2LCJmaWx0ZXIiOiI0MjljMDRmMTJhYzY2NmU3MzMzYjQ3MTQ3NGVjOTI1MDRkODI2ZGM2MWFhOWUwNTMyZWE4NDhjYmU0NjM3NmQ3IiwidGltZVpvbmUiOiJBc2lhL1Rva3lvIiwiZXhwaXJlcyI6MTc5MzU3MDY3MTQ3NH0.5ytqPpFb88f4DTINKp2myrENf69q8dhsAPVLV2vgw8g"
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/queries",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "CalculateBudgetSummary",
+      "input": {
+        "asOfDate": "2026-11-01",
+        "timeZone": "Asia/Tokyo"
+      }
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "CalculateBudgetSummary",
+      "value": {
+        "periodStart": "2026-11-01",
+        "periodEndExclusive": "2026-12-01",
+        "totalSpent": 1280,
+        "remainingBudget": 98720,
+        "dailyRecommended": 3290,
+        "projectedTotalExpense": 38400,
+        "daysTotal": 30,
+        "daysPassed": 1,
+        "daysRemaining": 30,
+        "isOverBudget": false,
+        "isProjectedToOverspend": false
+      },
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "EvaluateBudgetThresholds",
+      "input": {
+        "asOfDate": "2026-11-01",
+        "timeZone": "Asia/Tokyo"
+      },
+      "requestId": "f9b18cf7-3f77-473d-9c94-9fc7305b9d1d"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "EvaluateBudgetThresholds",
+      "requestId": "f9b18cf7-3f77-473d-9c94-9fc7305b9d1d",
+      "value": [],
+      "warnings": [],
+      "readGeneration": 6
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "UpsertCategory",
+      "input": {
+        "categoryId": "6eb6eed2-0596-4700-9f20-3b1613f403d3",
+        "expectedCatalogVersion": 1,
+        "name": "テスト",
+        "iconKey": "folder",
+        "colorHex": "#123456"
+      },
+      "requestId": "94e8b221-dd4f-43b0-8e1d-ef535061d392"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "UpsertCategory",
+      "requestId": "94e8b221-dd4f-43b0-8e1d-ef535061d392",
+      "value": {
+        "version": 2,
+        "categories": [
+          {
+            "id": "cat_food",
+            "name": "食費",
+            "iconKey": "restaurant",
+            "colorHex": "#F97316",
+            "sortOrder": 0,
+            "isSystem": false
+          },
+          {
+            "id": "cat_daily",
+            "name": "日用品",
+            "iconKey": "shopping_bag",
+            "colorHex": "#14B8A6",
+            "sortOrder": 1,
+            "isSystem": false
+          },
+          {
+            "id": "cat_transport",
+            "name": "交通費",
+            "iconKey": "train",
+            "colorHex": "#3B82F6",
+            "sortOrder": 2,
+            "isSystem": false
+          },
+          {
+            "id": "cat_cafe",
+            "name": "カフェ・外食",
+            "iconKey": "local_cafe",
+            "colorHex": "#A16207",
+            "sortOrder": 3,
+            "isSystem": false
+          },
+          {
+            "id": "cat_clothing",
+            "name": "衣服・美容",
+            "iconKey": "checkroom",
+            "colorHex": "#EC4899",
+            "sortOrder": 4,
+            "isSystem": false
+          },
+          {
+            "id": "cat_medical",
+            "name": "医療・健康",
+            "iconKey": "medical_services",
+            "colorHex": "#EF4444",
+            "sortOrder": 5,
+            "isSystem": false
+          },
+          {
+            "id": "cat_entertainment",
+            "name": "趣味・娯楽",
+            "iconKey": "sports_esports",
+            "colorHex": "#8B5CF6",
+            "sortOrder": 6,
+            "isSystem": false
+          },
+          {
+            "id": "cat_home",
+            "name": "住まい・通信",
+            "iconKey": "home",
+            "colorHex": "#6366F1",
+            "sortOrder": 7,
+            "isSystem": false
+          },
+          {
+            "id": "cat_uncategorized",
+            "name": "未分類",
+            "iconKey": "folder",
+            "colorHex": "#94A3B8",
+            "sortOrder": 8,
+            "isSystem": true
+          },
+          {
+            "id": "6eb6eed2-0596-4700-9f20-3b1613f403d3",
+            "name": "テスト",
+            "iconKey": "folder",
+            "colorHex": "#123456",
+            "sortOrder": 9,
+            "isSystem": false
+          }
+        ]
+      },
+      "warnings": [],
+      "readGeneration": 7
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "ReorderCatalog",
+      "input": {
+        "expectedCatalogVersion": 2,
+        "orderedIds": [
+          "6eb6eed2-0596-4700-9f20-3b1613f403d3",
+          "cat_uncategorized",
+          "cat_home",
+          "cat_entertainment",
+          "cat_medical",
+          "cat_clothing",
+          "cat_cafe",
+          "cat_transport",
+          "cat_daily",
+          "cat_food"
+        ]
+      },
+      "requestId": "d960fa3a-19b6-4ae7-b364-0b12e2fd0994"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "ReorderCatalog",
+      "requestId": "d960fa3a-19b6-4ae7-b364-0b12e2fd0994",
+      "value": {
+        "version": 3,
+        "categories": [
+          {
+            "id": "6eb6eed2-0596-4700-9f20-3b1613f403d3",
+            "name": "テスト",
+            "iconKey": "folder",
+            "colorHex": "#123456",
+            "sortOrder": 0,
+            "isSystem": false
+          },
+          {
+            "id": "cat_uncategorized",
+            "name": "未分類",
+            "iconKey": "folder",
+            "colorHex": "#94A3B8",
+            "sortOrder": 1,
+            "isSystem": true
+          },
+          {
+            "id": "cat_home",
+            "name": "住まい・通信",
+            "iconKey": "home",
+            "colorHex": "#6366F1",
+            "sortOrder": 2,
+            "isSystem": false
+          },
+          {
+            "id": "cat_entertainment",
+            "name": "趣味・娯楽",
+            "iconKey": "sports_esports",
+            "colorHex": "#8B5CF6",
+            "sortOrder": 3,
+            "isSystem": false
+          },
+          {
+            "id": "cat_medical",
+            "name": "医療・健康",
+            "iconKey": "medical_services",
+            "colorHex": "#EF4444",
+            "sortOrder": 4,
+            "isSystem": false
+          },
+          {
+            "id": "cat_clothing",
+            "name": "衣服・美容",
+            "iconKey": "checkroom",
+            "colorHex": "#EC4899",
+            "sortOrder": 5,
+            "isSystem": false
+          },
+          {
+            "id": "cat_cafe",
+            "name": "カフェ・外食",
+            "iconKey": "local_cafe",
+            "colorHex": "#A16207",
+            "sortOrder": 6,
+            "isSystem": false
+          },
+          {
+            "id": "cat_transport",
+            "name": "交通費",
+            "iconKey": "train",
+            "colorHex": "#3B82F6",
+            "sortOrder": 7,
+            "isSystem": false
+          },
+          {
+            "id": "cat_daily",
+            "name": "日用品",
+            "iconKey": "shopping_bag",
+            "colorHex": "#14B8A6",
+            "sortOrder": 8,
+            "isSystem": false
+          },
+          {
+            "id": "cat_food",
+            "name": "食費",
+            "iconKey": "restaurant",
+            "colorHex": "#F97316",
+            "sortOrder": 9,
+            "isSystem": false
+          }
+        ]
+      },
+      "warnings": [],
+      "readGeneration": 8
+    }
+  },
+  {
+    "path": "/commands",
+    "request": {
+      "schemaVersion": 3,
+      "operation": "RetireCategory",
+      "input": {
+        "categoryId": "6eb6eed2-0596-4700-9f20-3b1613f403d3",
+        "expectedCatalogVersion": 3
+      },
+      "requestId": "575abdfb-1fc6-494f-8e6f-169ccefc4879"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "operation": "RetireCategory",
+      "requestId": "575abdfb-1fc6-494f-8e6f-169ccefc4879",
+      "value": {
+        "categoryId": "6eb6eed2-0596-4700-9f20-3b1613f403d3",
+        "version": 4,
+        "movedExpenseCount": 0
+      },
+      "warnings": [],
+      "readGeneration": 9
+    }
+  },
+  {
+    "path": "/payment",
+    "request": {
+      "requestId": "c47cc4cf-0871-4b7e-80a9-f6b6b7c67df7",
+      "amount": "¥1,280",
+      "merchant": "セブン"
+    },
+    "response": {
+      "schemaVersion": 3,
+      "requestId": "c47cc4cf-0871-4b7e-80a9-f6b6b7c67df7",
+      "status": "created",
+      "expense_id": "e80efbd8-7ff8-4b37-9a06-59935b66930d",
+      "readGeneration": 10
+    }
+  }
+]

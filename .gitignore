@@ -1,0 +1,193 @@
+.DS_Store
+Thumbs.db
+
+# ========================================
+# General
+# ========================================
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history/
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# ========================================
+# IDE
+# ========================================
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Uncomment if VS Code settings should be ignored
+# .vscode/
+
+# ========================================
+# Flutter / Dart
+# ========================================
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+**/build/
+**/coverage/
+.widget_preview/
+
+# Debug and obfuscation symbols
+app.*.symbols
+app.*.map.json
+
+# ========================================
+# Android
+# ========================================
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/android/captures/
+**/.cxx/
+
+*.jks
+*.keystore
+
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# ========================================
+# iOS
+# ========================================
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/App.framework/
+**/ios/Flutter/Flutter.framework/
+**/ios/Flutter/flutter_assets/
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/**/DerivedData/
+**/ios/**/xcuserdata/
+
+# ========================================
+# macOS
+# ========================================
+**/macos/Pods/
+**/macos/.symlinks/
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# ========================================
+# Windows / Linux
+# ========================================
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+
+# ========================================
+# Environment / Secrets
+# ========================================
+.env
+.env.*
+!.env.example
+
+*.pem
+*.p12
+*.p8
+
+# ========================================
+# Local tools
+# ========================================
+.fvm/flutter_sdk/
+
+
+# ========================================
+# Terraform working directories
+# ========================================
+**/.terraform/
+
+# ========================================
+# Terraform state files
+# ========================================
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# ========================================
+# Terraform variable files
+# ========================================
+*.tfvars
+*.tfvars.json
+
+# Allow sample variable files
+!example.tfvars
+!example.tfvars.json
+
+# ========================================
+# Terraform plan files
+# ========================================
+*.tfplan
+tfplan
+plan.out
+
+# ========================================
+# Terraform crash logs
+# ========================================
+crash.log
+crash.*.log
+
+# ========================================
+# Terraform override files
+# ========================================
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# ========================================
+# Terraform CLI configuration
+# ========================================
+.terraformrc
+terraform.rc
+
+# ========================================
+# Credentials and secrets
+# ========================================
+.env
+.env.*
+!.env.example
+
+*.pem
+*.p12
+*.key
+*.jks
+*.keystore
+
+# ========================================
+# IDE / OS
+# ========================================
+.DS_Store
+.idea/
+*.iml
+.vscode/
+
+# ========================================
+# Temporary files
+# ========================================
+*.swp
+*.swo
+*~
+
+build/
+
+# Server build dependencies and generated Lambda archive
+node_modules/
+terraform/lambda_function_payload.zip
