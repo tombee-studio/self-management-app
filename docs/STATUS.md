@@ -1,0 +1,60 @@
+# 文書の現状・整合レビュー
+
+- **バージョン**: v0.2.0
+- **ステータス**: done
+- **確認日**: 2026-11-01（JST）
+
+## 対象・決定根拠
+
+ownerの回答により全9機能を対象とする。[ADR-0001](adr/0001-nine-feature-scope.md)と[REQ](req/REQ.md)へ反映した。作業ブランチは`feat/1-expense-management`、関連は[Issue #1](https://github.com/tombee-studio/self-management-app/issues/1)。
+
+比較対象はAGENTS・全運用文書、旧14仕様・14詳細設計、旧画面8タブ、現行コード・テスト資産。既存docs・lib等は基点`2a62721`で未追跡だったため、そのコミットをアプリ実装済みの証拠には使わない。今回の変更は文書だけで、コード・クラウド・外部Issueの内容は変更していない。
+
+## 工程の状態
+
+| 工程 | 状態 | 意味 |
+| :--- | :--- | :--- |
+| Layer 0 | 既存運用を維持 | 要求→設計→検証計画のゲートを変更していない |
+| REQ | 全9機能・一覧 done | 範囲、責務、ACをレビュー済み |
+| SPEC | 全9設計・一覧・画面 done | 文書間の方式・名称・期間・UI条件を統一 |
+| VERIFY計画 | 全9計画・一覧 done | 61必須ケースを全ACへ対応付けた |
+| VERIFY結果 | 全9機能とも未実施・未作成 | アプリの実装・検証完了ではない |
+| ADR | 0001 accepted / done | 全9機能の対象範囲をowner回答に基づき記録 |
+
+REQ・SPEC・VERIFY計画の実装開始ゲートを通過。実装・検証と結果レビューの完了ゲートは未通過。この依頼では実装・アプリテスト・実機確認・AWS接続検証へ進めていない。
+
+## 文書上の解決内容と実装差分
+
+旧課題IDを維持し、文書の矛盾とコードの追従作業を区別する。
+
+| ID | 文書側で統一した内容・正本 | コード・実環境で必要な後続作業 |
+| :--- | :--- | :--- |
+| DOC-01 | [REQ](req/REQ.md)で全9機能を対象化。要求案という保留を解消 | 確定計画に沿って実装対象を具体化 |
+| DOC-02 | [手動支出](spec/features/manual-expense-crud.md)は即時削除＋5秒Undo。[同期](spec/features/aws-cloud-database-sync.md)は同一DB取引のoutboxとtombstone | 現行SharedPreferencesキューをDB outboxへ移行し、競合・原子性を検証 |
+| DOC-03 | [共通スキーマ版2](spec/SPEC.md)と通信payloadを分離。is_synced列・通常全件Pushは不採用 | 現行schemaVersion=1から列・テーブル・索引を移行し、API v2と差分Pushを実装 |
+| DOC-04 | [共通UI](spec/features/cross-platform-shared-ui.md)・図とも600/840と2ペインへ統一 | main.dartの900閾値を置換し、状態保持・2ペイン・ショートカットを実装 |
+| DOC-05 | [履歴](spec/features/expense-history-list.md)で検索・複数条件・結果集計・50件取得を定義 | 現行月Stream画面へ検索・条件・ページングを実装 |
+| DOC-06 | [外部決済](spec/features/payment-event-ingestion.md)でURL/背景API/通知経路を区別し、成功・重複・失敗を定義 | ローカル通知・ガイド・API重複直列化・通知タップ等を実装し実機確認 |
+| DOC-07 | [予算](spec/features/budget-management.md)で開始日区切りの期間実績を使用し、暦月履歴と区別 | currentMonthExpensesStreamProviderの暦月入力を予算期間Providerへ分離 |
+| DOC-08 | [手動支出](spec/features/manual-expense-crud.md)で範囲外計算をエラーにし、入力検証・破棄確認・失敗保持を規定 | 現行Parserの上限clamp等を置換し、フォームと保存入口の検証を揃える |
+| DOC-09 | [同期](spec/features/aws-cloud-database-sync.md)で単一所有者・固定ID・HTTPS・自動同期OFFの挙動を統一 | ID編集UIを読み取り専用へ変更し、自動通信のON/OFFとrevision ackを実装 |
+| DOC-10 | 費用は月500円の目標とし、旧無料枠・為替・ゼロ円保証を[過去資料](archive/2026-11-01/common-design.md)へ隔離 | 専用環境の通知設定・利用条件・実費を記録。現在価格・稼働実績は未確認 |
+| DOC-11 | [VERIFY](verification/VERIFY.md)に全ACと具体的入力・手順・期待値を対応付け | 追加テストの実装、全必須ケース実行と結果・証跡の記録 |
+
+## 履歴・集約
+
+既存14識別子を9責務へ集約した対応は[SPEC](spec/SPEC.md)に記載。現在の機能文書を新設し直さず、同じ機能の正本へ反映した。旧仕様・詳細設計は[過去資料](archive/2026-11-01/README.md)へ保存し、元の節番号・コード例・追加項目の識別子を維持した。過去資料内の矛盾は歴史的な記述として区別し、現行正本へ混在させない。
+
+従来の各機能AC-01〜03は責務を維持して具体化し、追加ACは後続番号とした。旧資料中に確定済み検証結果はなく、過去の実装済みという表記を検証証跡として流用していない。
+
+## 内蔵レビュー結果
+
+- **判定**: PASS。全9機能のREQ・SPEC・画面・VERIFY計画の対応と、上位運用との整合を確認した。
+- **REQ**: 全件レビュー後にdoneとし、SPEC内容の同期を開始した。
+- **SPEC**: 削除方式、DB/通信項目、期間、閾値、通知経路を一本化し、画面と合わせてレビュー後にdoneとした。
+- **VERIFY**: SPEC確定後に計画を作成。全ACの対応、正常・異常・境界・状態遷移、手順・期待値・方法・合否基準を確認した。
+- **機械確認**: 450件のローカルMarkdown参照とアンカー、全9機能の状態・一覧、60 ACと61ケースの対応、draw.io全8画面のXML・セルID・ページ参照、旧28本文と旧図の保存を確認した。旧ファイルパスの削除なし。
+- **未解決の文書矛盾・owner判断**: なし。上表のコード差分・未実施結果は後続工程として明示した。
+- **コミット方針**: PASS対象のdocsだけをコミットする。未追跡のlib・test・terraform・ビルド生成物を含めない。
+
+実装完了の判断は全必須検証の実測結果と証跡に基づいて行う。今回の文書レビューPASSだけでアプリが動作することを保証したとは扱わない。
