@@ -2,6 +2,16 @@
 // Pure server-side conversion of a document-client JSON backup. No device DB access.
 const D=require('../domain/model');const {validate}=require('../api/schema');
 const {createHash}=require('node:crypto');
+function normalizePaymentMethod(method) {
+ if(!method)return 'cash';
+ const m=String(method).toLowerCase().replace(/[\s_-]/g,'');
+ if(m==='cash'||m==='manual')return 'cash';
+ if(m==='applepay')return 'applePay';
+ if(m==='creditcard')return 'creditCard';
+ if(m==='emoney')return 'eMoney';
+ if(m==='other')return 'other';
+ return 'cash';
+}
 function migrate(backup,ownerId) {
  if(!ownerId||backup.ownerId!==ownerId)D.fail('OwnerMismatch');
  for(const rows of [backup.categories||[],backup.expenses||[],backup.budgets||[],backup.categoryBudgets||[]])for(const row of rows)if(row.user_id&&row.user_id!==ownerId)D.fail('OwnerMismatch');
@@ -13,7 +23,8 @@ function migrate(backup,ownerId) {
   name=D.graphemes(name).slice(0,20).join('');const base=name;let suffix=1;
   while(names.has(D.key(name))){const tail=` (${++suffix})`;name=D.graphemes(base).slice(0,20-D.graphemes(tail).length).join('')+tail;}
   names.add(D.key(name));
-  catalog.categories.push({id:old.category_id,name,nameKey:D.key(name),iconKey:old.icon_key,colorHex:old.color_hex,sortOrder:old.sort_order||0,isSystem:old.category_id===D.uncategorized});
+  const iconKey=old.icon_key||old.icon_name||'folder';
+  catalog.categories.push({id:old.category_id,name,nameKey:D.key(name),iconKey,colorHex:old.color_hex,sortOrder:old.sort_order||0,isSystem:old.category_id===D.uncategorized});
  }
  if(!catalog.categories.some(c=>c.id===D.uncategorized))catalog.categories.push(D.defaults().categories.at(-1));
  catalog.categories=catalog.categories.sort((a,b)=>a.sortOrder-b.sortOrder||a.id.localeCompare(b.id)).map((x,sortOrder)=>({...x,sortOrder}));
@@ -21,8 +32,16 @@ function migrate(backup,ownerId) {
  validate(D.catalogView(catalog),'CatalogView');
  const expenses=(backup.expenses||[]).map(old=>{
   const categoryId=catalog.categories.some(c=>c.id===old.category_id)?old.category_id:D.uncategorized;
-  const e={id:old.expense_id,amount:old.amount,categoryId,spentAt:new Date(old.spent_at).toISOString(),memo:old.memo||null,paymentMethod:old.payment_method||'cash',source:old.source||'manual',externalTxId:old.external_tx_id||null,version:1,isDeleted:old.is_deleted===true,merchantKey:D.key(old.memo||''),memoSearch:D.key(old.memo||'')};
-  validate(D.expenseView(e,catalog),'ExpenseView');return e;
+  const isDeleted=old.is_deleted===true;
+  if(!isDeleted&&(!Number.isInteger(old.amount)||old.amount<1||old.amount>99999999))D.fail('ValidationFailed','amount');
+  const amount=isDeleted?(Number.isInteger(old.amount)&&old.amount>=1?old.amount:1):old.amount;
+  const rawMemo=(old.memo||old.merchant_name||'').trim();
+  const memo=rawMemo?D.graphemes(rawMemo).slice(0,100).join(''):null;
+  const paymentMethod=normalizePaymentMethod(old.payment_method);
+  const source=(old.source==='apple_pay'||old.payment_method==='Apple Pay'||old.payment_method==='applePay')?'apple_pay':(old.source||'manual');
+  const e={id:old.expense_id,amount,categoryId,spentAt:new Date(old.spent_at).toISOString(),memo,paymentMethod,source,externalTxId:old.external_tx_id||null,version:1,isDeleted,merchantKey:D.key(memo||''),memoSearch:D.key(memo||'')};
+  if(!isDeleted)validate(D.expenseView(e,catalog),'ExpenseView');
+  return e;
  });
  if(new Set(expenses.map(e=>e.id)).size!==expenses.length)D.fail('InvariantViolation','expenseId');
  let budget=null;
