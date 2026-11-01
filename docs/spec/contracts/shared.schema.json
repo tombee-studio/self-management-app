@@ -1,0 +1,998 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Iris public DTO contracts v1",
+  "x-document-status": "done",
+  "$defs": {
+    "EntityId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "UtcStamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+    },
+    "MoneyJPY": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 99999999
+    },
+    "AllocationYen": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99999999
+    },
+    "AggregateVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "OutboxRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "Memo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-graphemeMaxLength": 100
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "enum": [
+            "ValidationFailed",
+            "NotFound",
+            "VersionConflict",
+            "InvariantViolation",
+            "Busy",
+            "StorageFailure",
+            "TransportFailure",
+            "UndoExpired",
+            "OwnerMismatch",
+            "CursorInvalidated",
+            "UnsupportedVersion"
+          ]
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "field": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "error",
+        "retryable"
+      ],
+      "additionalProperties": false
+    },
+    "ExpenseChange": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "expense_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            },
+            "amount": {
+              "$ref": "shared.schema.json#/$defs/MoneyJPY"
+            },
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "spent_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "memo": {
+              "$ref": "shared.schema.json#/$defs/Memo"
+            },
+            "payment_method": {
+              "enum": [
+                "cash",
+                "applePay",
+                "creditCard",
+                "eMoney",
+                "other"
+              ]
+            },
+            "source": {
+              "enum": [
+                "manual",
+                "apple_pay"
+              ]
+            },
+            "external_tx_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "expense_id",
+            "updated_at",
+            "is_deleted",
+            "revision",
+            "amount",
+            "category_id",
+            "spent_at",
+            "memo",
+            "payment_method",
+            "source",
+            "external_tx_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "expense_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            }
+          },
+          "required": [
+            "expense_id",
+            "updated_at",
+            "is_deleted",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "CategoryChange": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "x-graphemeMaxLength": 20
+            },
+            "icon_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "color_hex": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "sort_order": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "is_system": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted",
+            "revision",
+            "name",
+            "icon_key",
+            "color_hex",
+            "sort_order",
+            "is_system"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AllocationChange": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            },
+            "allocated_amount": {
+              "$ref": "shared.schema.json#/$defs/AllocationYen"
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted",
+            "revision",
+            "allocated_amount"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "BudgetChange": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "budget_id": {
+              "const": "current"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            },
+            "monthly_amount": {
+              "$ref": "shared.schema.json#/$defs/MoneyJPY"
+            },
+            "start_day": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 28
+            },
+            "is_category_budget_enabled": {
+              "type": "boolean"
+            },
+            "is_alert_notification_enabled": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "budget_id",
+            "updated_at",
+            "is_deleted",
+            "revision",
+            "monthly_amount",
+            "start_day",
+            "is_category_budget_enabled",
+            "is_alert_notification_enabled"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "budget_id": {
+              "const": "current"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            },
+            "revision": {
+              "$ref": "shared.schema.json#/$defs/OutboxRevision"
+            }
+          },
+          "required": [
+            "budget_id",
+            "updated_at",
+            "is_deleted",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PushRequest": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "user_id": {
+          "$ref": "shared.schema.json#/$defs/EntityId"
+        },
+        "expenses": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/ExpenseChange"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/CategoryChange"
+          }
+        },
+        "category_budgets": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/AllocationChange"
+          }
+        },
+        "budget": {
+          "oneOf": [
+            {
+              "$ref": "shared.schema.json#/$defs/BudgetChange"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "expenses",
+        "categories",
+        "category_budgets"
+      ],
+      "additionalProperties": false
+    },
+    "Ack": {
+      "type": "object",
+      "properties": {
+        "entity_type": {
+          "enum": [
+            "expenses",
+            "categories",
+            "category_budgets",
+            "budget"
+          ]
+        },
+        "id": {
+          "$ref": "shared.schema.json#/$defs/EntityId"
+        },
+        "revision": {
+          "$ref": "shared.schema.json#/$defs/OutboxRevision"
+        }
+      },
+      "required": [
+        "entity_type",
+        "id",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "Conflict": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": {
+              "const": "expenses"
+            },
+            "id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "server_value": {
+              "$ref": "shared.schema.json#/$defs/ExpenseRecord"
+            }
+          },
+          "required": [
+            "entity_type",
+            "id",
+            "server_value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": {
+              "const": "categories"
+            },
+            "id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "server_value": {
+              "$ref": "shared.schema.json#/$defs/CategoryRecord"
+            }
+          },
+          "required": [
+            "entity_type",
+            "id",
+            "server_value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": {
+              "const": "category_budgets"
+            },
+            "id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "server_value": {
+              "$ref": "shared.schema.json#/$defs/AllocationRecord"
+            }
+          },
+          "required": [
+            "entity_type",
+            "id",
+            "server_value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": {
+              "const": "budget"
+            },
+            "id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "server_value": {
+              "$ref": "shared.schema.json#/$defs/BudgetRecord"
+            }
+          },
+          "required": [
+            "entity_type",
+            "id",
+            "server_value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PushResponse": {
+      "type": "object",
+      "properties": {
+        "accepted": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/Ack"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/Conflict"
+          }
+        },
+        "server_cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "accepted",
+        "conflicts",
+        "server_cursor"
+      ],
+      "additionalProperties": false
+    },
+    "PullResponse": {
+      "type": "object",
+      "properties": {
+        "expenses": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/ExpenseRecord"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/CategoryRecord"
+          }
+        },
+        "category_budgets": {
+          "type": "array",
+          "items": {
+            "$ref": "shared.schema.json#/$defs/AllocationRecord"
+          }
+        },
+        "budget": {
+          "oneOf": [
+            {
+              "$ref": "shared.schema.json#/$defs/BudgetRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_page_token": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "server_cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "expenses",
+        "categories",
+        "category_budgets",
+        "budget",
+        "next_page_token",
+        "server_cursor"
+      ],
+      "additionalProperties": false
+    },
+    "PaymentInput": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "amount": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99999999
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "description": "円記号・カンマ等を除去後JPY整数。意味検証はPAY-C01。"
+            }
+          ]
+        },
+        "currency": {
+          "const": "JPY"
+        },
+        "merchant": {
+          "type": "string"
+        },
+        "spent_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "const": "apple_pay"
+        },
+        "external_tx_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "amount"
+      ],
+      "additionalProperties": false
+    },
+    "PaymentResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "created",
+            "duplicate"
+          ]
+        },
+        "expense_id": {
+          "$ref": "shared.schema.json#/$defs/EntityId"
+        }
+      },
+      "required": [
+        "status",
+        "expense_id"
+      ],
+      "additionalProperties": false
+    },
+    "WindowContext": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "safeInsets": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "keyboardInsets": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "safeInsets",
+        "keyboardInsets"
+      ],
+      "additionalProperties": false
+    },
+    "AssetSpec": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "opaqueRequired": {
+          "type": "boolean"
+        },
+        "masterDigest": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "path",
+        "width",
+        "height",
+        "opaqueRequired",
+        "masterDigest"
+      ],
+      "additionalProperties": false
+    },
+    "ExpenseRecord": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "expense_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "amount": {
+              "$ref": "shared.schema.json#/$defs/MoneyJPY"
+            },
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "spent_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "memo": {
+              "$ref": "shared.schema.json#/$defs/Memo"
+            },
+            "payment_method": {
+              "enum": [
+                "cash",
+                "applePay",
+                "creditCard",
+                "eMoney",
+                "other"
+              ]
+            },
+            "source": {
+              "enum": [
+                "manual",
+                "apple_pay"
+              ]
+            },
+            "external_tx_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "expense_id",
+            "updated_at",
+            "is_deleted",
+            "amount",
+            "category_id",
+            "spent_at",
+            "memo",
+            "payment_method",
+            "source",
+            "external_tx_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "expense_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            }
+          },
+          "required": [
+            "expense_id",
+            "updated_at",
+            "is_deleted"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "CategoryRecord": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "x-graphemeMaxLength": 20
+            },
+            "icon_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "color_hex": {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            "sort_order": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "is_system": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted",
+            "name",
+            "icon_key",
+            "color_hex",
+            "sort_order",
+            "is_system"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AllocationRecord": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "allocated_amount": {
+              "$ref": "shared.schema.json#/$defs/AllocationYen"
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted",
+            "allocated_amount"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "$ref": "shared.schema.json#/$defs/EntityId"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            }
+          },
+          "required": [
+            "category_id",
+            "updated_at",
+            "is_deleted"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "BudgetRecord": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "budget_id": {
+              "const": "current"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": false
+            },
+            "monthly_amount": {
+              "$ref": "shared.schema.json#/$defs/MoneyJPY"
+            },
+            "start_day": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 28
+            },
+            "is_category_budget_enabled": {
+              "type": "boolean"
+            },
+            "is_alert_notification_enabled": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "budget_id",
+            "updated_at",
+            "is_deleted",
+            "monthly_amount",
+            "start_day",
+            "is_category_budget_enabled",
+            "is_alert_notification_enabled"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "budget_id": {
+              "const": "current"
+            },
+            "updated_at": {
+              "$ref": "shared.schema.json#/$defs/UtcStamp"
+            },
+            "is_deleted": {
+              "const": true
+            }
+          },
+          "required": [
+            "budget_id",
+            "updated_at",
+            "is_deleted"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

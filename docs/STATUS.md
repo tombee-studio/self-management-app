@@ -1,66 +1,62 @@
-# 文書の現状・整合レビュー
+# 文書の現状・DDD/契約設計レビュー
 
-- **バージョン**: v0.3.0
+- **バージョン**: v1.0.0
 - **ステータス**: done
 - **確認日**: 2026-11-01（JST）
 
-## 対象・決定根拠
+## 今回の対象
 
-ownerの回答により全9機能を対象とする。[ADR-0001](adr/0001-nine-feature-scope.md)と[REQ](req/REQ.md)へ反映した。作業ブランチは`feat/1-expense-management`、関連は[Issue #1](https://github.com/tombee-studio/self-management-app/issues/1)。
+ownerの指示により、既存全9機能をDDDと契約駆動設計を組み合わせた設計へ作り直した。[REQ/ARCH-01](req/REQ.md#arch-01-ドメインモデルと契約による設計)、[ADR-0002](adr/0002-domain-contract-design.md)、[共通アーキテクチャ](spec/architecture.md)に根拠・決定・共通規則を記録した。既存60 ACと9機能の範囲・業務ルールは維持する。
 
-比較対象はAGENTS・全運用文書、旧14仕様・14詳細設計、旧画面8タブ、現行コード・テスト資産。既存docs・lib等は基点`2a62721`で未追跡だったため、そのコミットをアプリ実装済みの証拠には使わない。今回の変更は文書だけで、コード・クラウド・外部Issueの内容は変更していない。
+前の依頼で進めていた実装変更は未コミットのまま保持し、この再設計に合わせる追加実装は今回行っていない。開始していたAndroidビルドは設計作業への切替時に停止した。作業ブランチは`feat/1-expense-management`、関連は[Issue #1](https://github.com/tombee-studio/self-management-app/issues/1)。
 
-## 工程の状態
+## 工程の現在地
 
-| 工程 | 状態 | 意味 |
+| 工程 | 判定・状態 | 適用範囲 |
 | :--- | :--- | :--- |
-| Layer 0 | レガシー保持方針・参照先を更新 | 要求→設計→検証計画のゲートを変更していない |
-| REQ | 全9機能・一覧 done | 範囲、責務、ACをレビュー済み |
-| SPEC | 全9設計・一覧・画面 done | 文書間の方式・名称・期間・UI条件を統一 |
-| VERIFY計画 | 全9計画・一覧 done | 61必須ケースを全ACへ対応付けた |
-| VERIFY結果 | 全9機能とも未実施・未作成 | アプリの実装・検証完了ではない |
-| ADR | 0001 accepted / done | 全9機能の対象範囲をowner回答に基づき記録 |
+| REQ | PASS / done | 9機能60 ACを維持、ARCH-01を追加 |
+| SPEC | PASS / done | 共通方針・9機能・34公開操作・OpenAPI/JSON Schema・8画面の契約対応 |
+| VERIFY計画 | PASS / done | 既存61ケース＋契約34ケース＋共通ARCH6ケース＝101必須ケース |
+| ADR | 0001/0002 accepted / done | 0001の全9機能対象を継承し、0002で設計方式を採用 |
+| 実装・VERIFY結果 | 未完了 | 新契約のprovider/consumer・依存方向・移行・実機検証は未実施 |
 
-REQ・SPEC・VERIFY計画の実装開始ゲートを通過。実装・検証と結果レビューの完了ゲートは未通過。この依頼では実装・アプリテスト・実機確認・AWS接続検証へ進めていない。
+上位REQを確定してからSPECを同期し、SPECレビュー後にVERIFY計画を更新した。計画doneは実施結果の合格ではない。新設計の実装開始ゲートは通過したが、実装完了ゲートは未通過。
 
-## 文書上の解決内容と実装差分
+## 既存機能への集約と変更
 
-旧課題IDを維持し、文書の矛盾とコードの追従作業を区別する。
-
-| ID | 文書側で統一した内容・正本 | コード・実環境で必要な後続作業 |
+| 機能 | 所属・モデル | 公開契約 |
 | :--- | :--- | :--- |
-| DOC-01 | [REQ](req/REQ.md)で全9機能を対象化。要求案という保留を解消 | 確定計画に沿って実装対象を具体化 |
-| DOC-02 | [手動支出](spec/features/manual-expense-crud.md)は即時削除＋5秒Undo。[同期](spec/features/aws-cloud-database-sync.md)は同一DB取引のoutboxとtombstone | 現行SharedPreferencesキューをDB outboxへ移行し、競合・原子性を検証 |
-| DOC-03 | [共通スキーマ版2](spec/SPEC.md)と通信payloadを分離。is_synced列・通常全件Pushは不採用 | 現行schemaVersion=1から列・テーブル・索引を移行し、API v2と差分Pushを実装 |
-| DOC-04 | [共通UI](spec/features/cross-platform-shared-ui.md)・図とも600/840と2ペインへ統一 | main.dartの900閾値を置換し、状態保持・2ペイン・ショートカットを実装 |
-| DOC-05 | [履歴](spec/features/expense-history-list.md)で検索・複数条件・結果集計・50件取得を定義 | 現行月Stream画面へ検索・条件・ページングを実装 |
-| DOC-06 | [外部決済](spec/features/payment-event-ingestion.md)でURL/背景API/通知経路を区別し、成功・重複・失敗を定義 | ローカル通知・ガイド・API重複直列化・通知タップ等を実装し実機確認 |
-| DOC-07 | [予算](spec/features/budget-management.md)で開始日区切りの期間実績を使用し、暦月履歴と区別 | currentMonthExpensesStreamProviderの暦月入力を予算期間Providerへ分離 |
-| DOC-08 | [手動支出](spec/features/manual-expense-crud.md)で範囲外計算をエラーにし、入力検証・破棄確認・失敗保持を規定 | 現行Parserの上限clamp等を置換し、フォームと保存入口の検証を揃える |
-| DOC-09 | [同期](spec/features/aws-cloud-database-sync.md)で単一所有者・固定ID・HTTPS・自動同期OFFの挙動を統一 | ID編集UIを読み取り専用へ変更し、自動通信のON/OFFとrevision ackを実装 |
-| DOC-10 | 費用は月500円の目標とし、過去の無料枠・為替・ゼロ円保証を採用しない | 専用環境の通知設定・利用条件・実費を記録。現在価格・稼働実績は未確認 |
-| DOC-11 | [VERIFY](verification/VERIFY.md)に全ACと具体的入力・手順・期待値を対応付け | 追加テストの実装、全必須ケース実行と結果・証跡の記録 |
+| 手動支出 | ExpenseLedger / Expense集約 | MAN-C01〜05 |
+| 日次 | LedgerのDailyExpenseSummary ReadModel | DASH-C01〜02 |
+| 履歴 | LedgerのHistory ReadModel | HIST-C01〜03 |
+| 予算 | Budgeting / BudgetPlanとAllocation | BUD-C01〜03 |
+| カテゴリ | CategoryCatalogとCategory | CAT-C01〜04 |
+| 外部決済 | PaymentIntegration / ACLと台帳取り込み | PAY-C01〜04 |
+| 同期 | Replication / OutboxChangeとSyncSession | SYN-C01〜07 |
+| 共通UI | PresentationPolicy / 値・UI状態 | UI-C01〜03 |
+| アイコン | BrandAssets / manifest・検査契約 | ICON-C01〜03 |
 
-## 履歴・集約
+既存機能書と索引へ反映し、方式追加を理由に新しい業務機能を増やしていない。集約、不変条件、型付きPort、依存方向、事前/事後条件、副作用、失敗、冪等性を各契約で定義した。DB生成行を公開モデルにせず、DomainはFlutter・Riverpod・drift・HTTPへ依存しない。
 
-既存14識別子を9責務へ集約した対応は[SPEC](spec/SPEC.md)に記載。現在の機能文書を新設し直さず、同じ機能の正本へ反映した。ownerの削除指示に従い、レガシー資料・互換案内を削除した。元の本文・コード例・図はGitコミット`9f30200`に残る。現行の正本へ過去の矛盾を混在させない。
+DB目標は版3へ変更。AggregateVersions、追記型DomainEventOutbox、ReadProjectionStateを追加し、送信状態をcoalesceするSyncOutboxと分離する。版1→2→3と途中版2→3のデータ保持移行を計画した。wire版2・内部イベント版1との版混同を防ぐ。
 
-従来の各機能AC-01〜03は責務を維持して具体化し、追加ACは後続番号とした。旧資料中に確定済み検証結果はなく、過去の実装済みという表記を検証証跡として流用していない。
+既存TC-01以降のIDと受け入れ基準を維持し、同期TC-09だけ最終DB移行先を版3へ同期した。旧手順はGitの81798ff以前で参照できる。新しいTC-CTとTC-ARCHは既存の結果証跡を書き換えずに追加した。レガシー資料を再作成していない。
 
-## 内蔵レビュー結果
+## 実装へ引き継ぐ差分
 
-- **判定**: PASS。全9機能のREQ・SPEC・画面・VERIFY計画の対応と、上位運用との整合を確認した。
-- **REQ**: 全件レビュー後にdoneとし、SPEC内容の同期を開始した。
-- **SPEC**: 削除方式、DB/通信項目、期間、閾値、通知経路を一本化し、画面と合わせてレビュー後にdoneとした。
-- **VERIFY**: SPEC確定後に計画を作成。全ACの対応、正常・異常・境界・状態遷移、手順・期待値・方法・合否基準を確認した。
-- **機械確認**: 現行文書のローカルMarkdown参照とアンカー、全9機能の状態・一覧、60 ACと61ケースの対応、draw.io全8画面のXML・セルID・ページ参照を確認した。レガシー資料・互換案内を削除し、その参照と保存前提の記述を更新した。
-- **未解決の文書矛盾・owner判断**: なし。上表のコード差分・未実施結果は後続工程として明示した。
-- **コミット方針**: PASS対象の文書と、削除した文書を再作成しないためのローカルスキル参照修正だけをコミットする。未追跡のlib・test・terraform・ビルド生成物を含めない。
+1. UIからのDB直接更新をApplication Handlerへ移し、Domain-owned Repository PortとInfrastructure adapterを分離する。
+2. Expense/Catalog/BudgetPlanの不変条件を値型・集約でも保護し、expectedVersionによるCASを実装する。
+3. UnitOfWorkに状態・集約版・DomainEventOutbox・SyncOutbox・読み取り世代を参加させる。カテゴリ廃止は台帳/予算/カテゴリのPortを調整する。
+4. Dashboard/Historyを読取専用QueryPortへ分け、snapshotId・カーソル無効化・同一スナップショットの集計を実装する。
+5. Payment ACLとLedgerIngestionPort、同期wire DTOとDomain Eventを分離し、公開スキーマと型/エラー/再送条件にconsumer/providerを合わせる。
+6. DB版3の移行と101ケースを検証する。旧設計に対する単体・Widgetテストや途中コードの結果を新契約の合格として流用しない。
 
-実装完了の判断は全必須検証の実測結果と証跡に基づいて行う。今回の文書レビューPASSだけでアプリが動作することを保証したとは扱わない。
+この一覧はコードの適合完了を保証しない。前の実装タスクに残る画面・通知・同期・実機確認も、新設計の契約へ照合して再評価する。
 
-## レガシー削除レビュー
+## 内蔵レビュー・文書検証
 
-ownerの明示指示によりレガシー資料・互換案内を削除し、運用・ローカルスキルの保持/再作成手順も現行参照へ同期した。レビューPASS。現行9機能の内容、60 ACと61ケース、8画面の対応を保持し、文書とスキルのローカル参照351件を確認した。過去の本文・図はGitコミット`9f30200`で参照できる。
-
-skill-creatorのquick_validate.pyは環境にPyYAMLがないため未実行。代わりに3スキルの必須frontmatter・名称・参照先・現行運用との整合を確認した。アプリテスト・実機検証は今回の変更対象外。
+- 判定: PASS。上位運用・REQの範囲、9機能の責務/モデル、34契約の完全性とPortの所有、API/イベント表現、8画面の対応、VERIFYの追跡をレビューした。
+- 構造検証: ローカルMarkdownリンク/アンカー516件、JSONの$ref、Schema本体、15個の正常/異常ベクトル、OpenAPI operationと契約ID、全ACと検証ケース、draw.ioのXML/セルID/契約参照を確認した。
+- スキーマ例の検証は文書の機械可読定義だけを対象とし、アプリのprovider/consumer契約テストを実行済みとは扱わない。
+- 未解決の設計方式・owner判断: なし。実装・実環境検証は後続作業として残す。
+- コミット: 今回の文書変更だけを対象とする。未コミットのlib/test/terraform/依存/生成物を含めず、push・デプロイは行わない。

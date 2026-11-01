@@ -1,12 +1,28 @@
 # Layer 2: 設計インデックス
 
-- **バージョン**: v0.5.0
+- **バージョン**: v1.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
 ## 適用範囲・共通アーキテクチャ
 
-[REQ](../req/REQ.md)の全9機能を対象とし、Flutterのfeature単位でpresentation/domain/dataを分離する。UIはRiverpod、永続化はdrift/SQLite、クラウドはHTTP API・Lambda・DynamoDBとTerraformを用いる。型安全なローカルStreamと端末内保存を基本とし、クラウド通信の完了をUI保存の前提にしない。OS差分は通知・リンク・保存先のアダプタに閉じ込める。
+[REQ](../req/REQ.md)の全9機能を対象とし、DDDのコンテキストと契約に基づき、presentation/application/domain/infrastructureを分離する。UIはRiverpod、永続化はdrift/SQLite、クラウドはHTTP API・Lambda・DynamoDBとTerraformを用いる。型安全なローカルStreamと端末内保存を基本とし、クラウド通信の完了をUI保存の前提にしない。OS差分は通知・リンク・保存先のアダプタに閉じ込める。
+
+## 共通の設計正本
+
+[共通アーキテクチャ](architecture.md)にコンテキストマップ、用語・値型、集約境界、Port、UnitOfWork、契約の共通失敗/冪等性、依存方向を定める。[公開契約](contracts/README.md)にOpenAPI/JSON Schemaを置く。各機能は同じ既存文書へ再設計を集約し、機能を増やさない。DomainはFlutter/Riverpod/drift/HTTPへ依存しない。
+
+| 機能 | モデルの種類 | 契約接頭辞 |
+| :--- | :--- | :--- |
+| 手動支出 | Expense集約 | MAN |
+| 日次 | LedgerのReadModel | DASH |
+| 履歴 | LedgerのReadModel | HIST |
+| 予算 | BudgetPlan/Allocation | BUD |
+| カテゴリ | CategoryCatalog/Category | CAT |
+| 外部決済 | ACLと取り込みApplication | PAY |
+| 同期 | OutboxChange/SyncSession | SYN |
+| 共通UI | 純粋Policy/UI状態 | UI |
+| アイコン | AssetManifest/ビルド契約 | ICON |
 
 ## 機能別設計一覧
 
@@ -22,9 +38,9 @@
 | 共通UI・マルチデバイス対応 | [cross-platform-shared-ui](features/cross-platform-shared-ui.md) | [REQ](../req/features/cross-platform-shared-ui.md) | done |
 | アプリアイコン・ブランディング | [app-icon-branding](features/app-icon-branding.md) | [REQ](../req/features/app-icon-branding.md) | done |
 
-## 共通データモデル（目標スキーマ版2）
+## 共通データモデル（目標スキーマ版3）
 
-現行コードのschemaVersion=1から移行する目標設計。下記がDB上の正本であり、ローカルis_synced/is_deleted列は使用しない。
+現行の版1と、作業途中の版2のDBから移行する目標設計。下記がDB上の正本であり、ローカルis_synced/is_deleted列は使用しない。
 
 | テーブル | 主キー・主な列 | 制約 |
 | :--- | :--- | :--- |
@@ -34,12 +50,15 @@
 | CategoryBudgets | categoryId,allocatedAmount,updatedAt | categoryId参照。0円以上 |
 | SyncOutbox | entityType+entityId,operation,payloadJson,updatedAt,revision | 本体変更と同一トランザクション。送信時revisionでack |
 | NotificationHistory | periodStart+threshold,notifiedAt | 予算通知の重複防止 |
+| AggregateVersions | context+aggregateId,version,updatedAt | 集約単位のCAS。削除後も版を保持 |
+| DomainEventOutbox | eventId,aggregateId,aggregateVersion,eventType,payloadJson,occurredAt,deliveryState | 追記型のドメインイベント配送。SyncOutboxとは分離 |
+| ReadProjectionState | projectionId,generation | 業務変更と同じUoWで世代を進め、カーソルを検証 |
 
 日時はUTCのミリ秒精度で保持・通信する。表示・日次/月次の境界は端末ローカルの暦日で計算してUTC範囲へ変換する。範囲は開始以上・次の境界未満とする。カテゴリ参照を必須とし、未分類を起動・移行時に冪等生成する。外部店舗名はmemoへ保存し、sourceとpaymentMethodを分離する。検索用memoSearchはNFKC・lowercase・trimを適用する。
 
 ### 移行
 
-onUpgradeで版1から列・新テーブル・インデックスを追加し、既存メモ・名称の正規化値を埋める。既存ID・支出・配分・予算を保持する。旧削除保留IDは同期起動前にoutboxへ取り込み、DB保存成功後だけSharedPreferencesから除く。既存データを初回outboxへ登録し、移行中に同期を起動しない。移行失敗はトランザクションを戻してエラーを表示し、DBを作り直してデータを失わせない。
+onUpgradeで版1→2の列・新テーブル・インデックスの移行を保持し、版2→3でAggregateVersions・DomainEventOutbox・ReadProjectionStateを追加する。既存のExpense/CategoryCatalog/BudgetPlanへ版1を割り当てる。既存メモ・名称の正規化値を埋める。既存ID・支出・配分・予算を保持する。旧削除保留IDは同期起動前にoutboxへ取り込み、DB保存成功後だけSharedPreferencesから除く。既存データを初回outboxへ登録し、移行中に同期を起動しない。移行失敗はトランザクションを戻してエラーを表示し、DBを作り直してデータを失わせない。
 
 ## 共通ルール・画面
 
@@ -65,3 +84,7 @@ onUpgradeで版1から列・新テーブル・インデックスを追加し、�
 ## 関連ADR
 
 [ADR-0001: 全9機能の対象範囲](../adr/0001-nine-feature-scope.md)に従う。文書確定と実装・検証完了は別に判定する。
+
+## 設計方式のADR
+
+[ADR-0002](../adr/0002-domain-contract-design.md)のDDD＋契約駆動方針を全9機能・共通DTO・イベントへ反映した。DB表はInfrastructureの保存形式であり、集約・公開DTOをDB生成クラスと同一視しない。

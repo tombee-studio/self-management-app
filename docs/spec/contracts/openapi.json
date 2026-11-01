@@ -1,0 +1,427 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Iris Replication and Payment API",
+    "version": "2.0.0",
+    "description": "SYN/PAY公開契約。DB版3/内部イベント版1とは独立。スキーマ適合はDomainの意味検証を代替しない。"
+  },
+  "x-document-status": "done",
+  "servers": [
+    {
+      "url": "https://{host}",
+      "variables": {
+        "host": {
+          "default": "example.invalid"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/sync/push": {
+      "post": {
+        "operationId": "pushOutbox",
+        "x-contract-id": "SYN-C02",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "固定所有者ID。body.user_id > header > query.user_idの順で解決。識別子であり認証資格ではない。未指定400、許可外403。"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "shared.schema.json#/$defs/PushRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功（個別項目の競合はPushResponseで通知）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/PushResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "入力不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "所有者範囲外",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "保存失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "接続失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sync/pull": {
+      "get": {
+        "operationId": "pullChanges",
+        "x-contract-id": "SYN-C07",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "固定所有者ID。body.user_id > header > query.user_idの順で解決。識別子であり認証資格ではない。未指定400、許可外403。"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功（個別項目の競合はPushResponseで通知）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/PullResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "入力/カーソル不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "所有者範囲外",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "取得失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "接続失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment": {
+      "get": {
+        "operationId": "getPayment",
+        "x-contract-id": "PAY-C03",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "固定所有者ID。body.user_id > header > query.user_idの順で解決。識別子であり認証資格ではない。未指定400、許可外403。"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "merchant",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "spent_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "const": "apple_pay"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "const": "JPY"
+            }
+          },
+          {
+            "name": "external_tx_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功（個別項目の競合はPushResponseで通知）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/PaymentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "決済入力不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "所有者範囲外",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "処理中。再試行可能",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "保存失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "接続失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "postPayment",
+        "x-contract-id": "PAY-C03",
+        "parameters": [
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "固定所有者ID。body.user_id > header > query.user_idの順で解決。識別子であり認証資格ではない。未指定400、許可外403。"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "shared.schema.json#/$defs/PaymentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功（個別項目の競合はPushResponseで通知）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/PaymentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "決済入力不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "所有者範囲外",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "処理中。再試行可能",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "保存失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "接続失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "shared.schema.json#/$defs/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # アプリアイコン・ブランディング 検証計画
 
-- **バージョン**: v0.1.0
+- **バージョン**: v1.0.0
 - **ステータス**: done
 - **計画日**: 2026-11-01（JST）
 
@@ -26,3 +26,19 @@
 単体・結合ケースは必要なテストを実装し`flutter test test/unit`、Widgetケースは`flutter test test/widget test/widget_test.dart`で実行する。新設するテストのパスと実行対象は結果へ記録する。現存テストの成功だけで本表全件を実施済みにしない。API・E2E・実機は表の手順を実施し、要求データと応答、前後のDB状態、画面・通知の証跡を保存する。
 
 結果には対象コミット、実施日時（JSTと必要なUTC）、Flutter/Dart・OS・端末/画面幅・DB版、実測結果、判定、証跡へのリンク、不具合・再検証を記載する。端末内の実データや既存クラウドへ検証用明細を送らず、専用テスト環境を使う。
+
+## ドメイン・公開契約の検証（ARCH-01）
+
+[共通アーキテクチャ](../../spec/architecture.md)と機能書の契約を対象とする。既存TC-01以降を残し、以下のTC-CTを追加する。文書での契約定義・スキーマ例の検証をprovider/consumer実装の合格と混同しない。
+
+基準fixture: 正常master/manifest、画像欠落・寸法不一致・透過PNG、同digestの2回生成、実機証跡未提供を用意。
+
+| ケースID | 対応契約・要求 | 入力/前提・手順 | 合否基準 | 方法 |
+| :--- | :--- | :--- | :--- | :--- |
+| app-icon-branding/TC-CT-01 | [ICON-C01](../../spec/features/app-icon-branding.md#icon-c01)、REQ/ARCH-01、AC-01/02 | 上のfixtureからValidateIconManifestの正常入力と、事前条件「参照manifestと画像を読める」を1項目ずつ破る入力を生成。成功→同要求再送→stale版/不正入力→失敗注入の順で実行。非該当の版・書込条件はQuery/純粋Policyの副作用ゼロで確認 | 成功保証「全参照先の存在・寸法・iOS透過を確認。不正を既定ロゴで代用して成功にしない」を実値/件数で確認。失敗はAssetMissing/DimensionMismatch/TransparencyViolation/StorageFailureと一致し、未commitなら状態/版/Outbox不変。再試行は「読取専用。同じアセットは同じ機械判定」どおり | Domain単体＋Application/provider契約テスト。HTTP境界がある操作は共通fixtureでconsumerも検証 |
+| app-icon-branding/TC-CT-02 | [ICON-C02](../../spec/features/app-icon-branding.md#icon-c02)、REQ/ARCH-01、AC-01/03/04 | 上のfixtureからGenerateIconVariantsの正常入力と、事前条件「既存マスター・必要寸法が妥当、出力先が明示されている」を1項目ずつ破る入力を生成。成功→同要求再送→stale版/不正入力→失敗注入の順で実行。非該当の版・書込条件はQuery/純粋Policyの副作用ゼロで確認 | 成功保証「比率保持で規定寸法へ出力し、失敗時に部分生成物を配布対象へ昇格しない。入力マスターは変更しない」を実値/件数で確認。失敗はValidationFailed/StorageFailureと一致し、未commitなら状態/版/Outbox不変。再試行は「同じマスターdigest/manifestなら同じ出力。新規画像生成はしない」どおり | Domain単体＋Application/provider契約テスト。HTTP境界がある操作は共通fixtureでconsumerも検証 |
+| app-icon-branding/TC-CT-03 | [ICON-C03](../../spec/features/app-icon-branding.md#icon-c03)、REQ/ARCH-01、AC-02/03/04 | 上のfixtureからReviewInstalledIconの正常入力と、事前条件「対象OSの実機に同じbuildを導入し証跡あり」を1項目ずつ破る入力を生成。成功→同要求再送→stale版/不正入力→失敗注入の順で実行。非該当の版・書込条件はQuery/純粋Policyの副作用ゼロで確認 | 成功保証「Flutterロゴ残存なし・モチーフ欠けなし・色調整合を記録。未実施をPASSにしない」を実値/件数で確認。失敗はEvidenceMissing/VisualMismatchと一致し、未commitなら状態/版/Outbox不変。再試行は「同buildの証跡に結び付け、別buildへ合格を流用しない」どおり | Domain単体＋Application/provider契約テスト。HTTP境界がある操作は共通fixtureでconsumerも検証 |
+
+Portのfakeと本番adapterへ同じcontract suiteを適用する。Queryは業務DB・版・Outboxの変更回数0、Commandはcommit後に限るイベント発行を監視する。同期は部分commit契約に従いACK済みだけが残り、cursor/lastSuccessは成功条件を満たした時だけ更新されることを確認する。UI・アイコンではDB参加を要求せず、純粋Policy/ビルド契約と実機証跡を確認する。
+
+追加契約テストは今回未実施。途中実装の既存テスト結果を新契約への合格証跡として流用しない。
