@@ -1,6 +1,6 @@
 # アプリアイコン・ブランディング 要求
 
-- **バージョン**: v0.2.0
+- **バージョン**: v0.3.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -36,7 +36,6 @@
 
 - [対応SPEC](../../spec/features/app-icon-branding.md)
 - [REQ一覧](../REQ.md)
-- [旧仕様・詳細設計](../../archive/2026-11-01/features/app-icon-branding.md)
 - [Issue #1](https://github.com/tombee-studio/self-management-app/issues/1)とownerの全9機能対象の回答を根拠とする。
 
 既存文書へ集約し、同じ責務の追加・修正を別機能として登録しない。AC-01〜03は従来案の基本責務を維持して具体化し、追加条件はAC-04以降へ登録した。API・保存方式・UI配置はREQの基準を満たす範囲でSPECに定める。

@@ -1,6 +1,6 @@
 # ドキュメント案内
 
-- **バージョン**: v0.2.0
+- **バージョン**: v0.3.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -15,10 +15,9 @@ iris 支出管理の全9機能について、要求・設計・画面仕様・�
 | ケース・合否基準・実施結果の入口 | [Layer 3 VERIFY](verification/VERIFY.md) |
 | 対象範囲などの横断判断 | [ADR一覧](adr/ADR.md) |
 | レビュー結果とコードの未対応箇所 | [STATUS](STATUS.md) |
-| 旧仕様・詳細設計・旧画面の履歴 | [過去資料](archive/2026-11-01/README.md) |
 
-参照優先順位は運用 → REQ → SPEC → VERIFY。実装は設計に追従させる。旧パスの`SPEC.md`、`IMPLEMENTATION.md`、`implementation/features/`、`design/DESIGN.md`は移行先案内であり、独立した正本ではない。
+参照優先順位は運用 → REQ → SPEC → VERIFY。実装は設計に追従させる。レガシー資料と互換案内は削除済み。以前の版が必要な場合はGit履歴（`9f30200`）を参照する。
 
 日次・履歴は暦日/暦月、予算は開始日基準の家計期間。削除は即時ローカル削除とDB outbox、クラウドはtombstone。UI閾値は600/840。詳細条件の重複定義は避け、各機能の正本を参照する。
 
-旧資料は保存時点の主張を含む。過去の無料枠・料金試算・実装済み表記・旧方式を現行の確定条件や検証合格として扱わない。関連Issueは[支出管理機能を追加する #1](https://github.com/tombee-studio/self-management-app/issues/1)。
+過去の無料枠・料金試算・実装済み表記を現行の確定条件や検証合格として扱わない。関連Issueは[支出管理機能を追加する #1](https://github.com/tombee-studio/self-management-app/issues/1)。

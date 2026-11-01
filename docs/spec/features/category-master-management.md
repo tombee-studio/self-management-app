@@ -1,10 +1,10 @@
 # カテゴリマスター管理 設計
 
-- **バージョン**: v0.3.0
+- **バージョン**: v0.4.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
-対応要求: [REQ](../../req/features/category-master-management.md)。設計の正本は本書。旧仕様・詳細設計は[過去資料](../../archive/2026-11-01/features/category-master-management.md)で保持する。
+対応要求: [REQ](../../req/features/category-master-management.md)。設計の正本は本書。
 
 ## SPEC-01: マスター操作
 

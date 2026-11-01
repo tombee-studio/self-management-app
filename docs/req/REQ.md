@@ -1,6 +1,6 @@
 # Layer 1: 要求インデックス
 
-- **バージョン**: v0.3.0
+- **バージョン**: v0.4.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -36,7 +36,7 @@ iris 支出管理（パッケージ: `iris_app`）。個人が日々の支出を
 
 ## レビューと工程
 
-[REQ運用](../operations/01_REQ.md)で本書と全機能をレビューし、全件done後にSPECを同期する。実装・検証の完了判定は[VERIFY](../verification/VERIFY.md)で行う。[過去資料](../archive/2026-11-01/README.md)は正本・ゲート対象に含めない。横断判断の記録は[ADR](../adr/ADR.md)に従う。
+[REQ運用](../operations/01_REQ.md)で本書と全機能をレビューし、全件done後にSPECを同期する。実装・検証の完了判定は[VERIFY](../verification/VERIFY.md)で行う。横断判断の記録は[ADR](../adr/ADR.md)に従う。
 
 ## 関連ADR
 

@@ -1,6 +1,6 @@
 # OPERATIONS.md - 開発・運用ルール
 
-- **バージョン**: v2.0.0
+- **バージョン**: v2.1.0
 - **ステータス**: done
 
 ## 1. 階層と進行
@@ -26,7 +26,7 @@ flowchart TD
 | Layer 3 | [03_VERIFY.md](03_VERIFY.md) | [VERIFY](../verification/VERIFY.md)、検証計画・ケース・結果・証跡 |
 | 実装 | [IMPL.md](IMPL.md) | ソースコード、自動テスト、静的解析 |
 
-従来の詳細設計はLayer 2へ統合する。旧 `docs/design/` と `03_DESIGN.md` は移行案内として残す。
+詳細設計はLayer 2のSPECへ統合する。ownerの2026-11-01の指示により、レガシー資料・互換案内は削除し、以前の版はGit履歴で参照する。現行文書はREQ・SPEC・VERIFYを正本とする。
 
 ## 3. 上位同期と移行ゲート
 

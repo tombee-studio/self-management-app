@@ -7,7 +7,7 @@
         <mxCell id="title" value="SCR-001  日次支出ダッシュボード" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/daily-expense-dashboard.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/daily-expense-dashboard.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/daily-expense-dashboard.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/daily-expense-dashboard.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -55,7 +55,7 @@
         <mxCell id="rule-5" value="6. 840以上は左にサマリー・右に明細/編集。削除は即時＋5秒Undo" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -69,7 +69,7 @@
         <mxCell id="title" value="SCR-002  外部決済連携設定" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/payment-event-ingestion.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/payment-event-ingestion.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/payment-event-ingestion.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/payment-event-ingestion.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -117,7 +117,7 @@
         <mxCell id="rule-5" value="6. Google Pay等の追加アダプタは対象外。rawPayloadを保存しない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -131,7 +131,7 @@
         <mxCell id="title" value="SCR-003  マルチデバイス・画面回転レイアウト" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/cross-platform-shared-ui.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/cross-platform-shared-ui.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/cross-platform-shared-ui.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/cross-platform-shared-ui.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -179,7 +179,7 @@
         <mxCell id="rule-5" value="6. iOS/Androidで業務ルールを共通化。最低OS版はiOS 16・Android 12" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -193,7 +193,7 @@
         <mxCell id="title" value="SCR-004  支出履歴・カレンダー一覧" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/expense-history-list.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/expense-history-list.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/expense-history-list.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/expense-history-list.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -241,7 +241,7 @@
         <mxCell id="rule-5" value="6. 明細タップはSCR-005。ページ失敗で既表示を消さない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -255,7 +255,7 @@
         <mxCell id="title" value="SCR-005  支出登録・編集モーダル" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/manual-expense-crud.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/manual-expense-crud.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/manual-expense-crud.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/manual-expense-crud.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -303,7 +303,7 @@
         <mxCell id="rule-5" value="6. 明示削除は確認して即時削除。スワイプ削除のみ5秒Undo" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -317,7 +317,7 @@
         <mxCell id="title" value="SCR-006  予算設定・管理画面" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/budget-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/budget-management.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/budget-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/budget-management.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -365,7 +365,7 @@
         <mxCell id="rule-5" value="6. 背景・Done・タブでキーボード解除。DB失敗時は遷移しない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -379,7 +379,7 @@
         <mxCell id="title" value="SCR-007  カテゴリ管理画面" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/category-master-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/category-master-management.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/category-master-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/category-master-management.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -427,7 +427,7 @@
         <mxCell id="rule-5" value="6. 他端末で削除済みなら保存せず最新一覧を表示" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
@@ -441,7 +441,7 @@
         <mxCell id="title" value="SCR-008  クラウド同期設定画面" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v0.3.0 | done | 2026-11-01 | 現行設計: features/aws-cloud-database-sync.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/aws-cloud-database-sync.md">
+        <mxCell id="meta" value="v0.4.0 | done | 2026-11-01 | 現行設計: features/aws-cloud-database-sync.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/aws-cloud-database-sync.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -489,7 +489,7 @@
         <mxCell id="rule-5" value="6. Push/Pull両成功後だけ成功日時とカーソル更新。費用目標500円は保証ではない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。&#10;過去の図: ../archive/2026-11-01/screens.drawio" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+        <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
       </root>
