@@ -1,16 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Iris public DTO contracts v1",
+  "$id": "https://iris.example/contracts/shared.schema.json",
+  "title": "iris API v3 DTOs",
+  "x-document-version": "2.0.0",
   "x-document-status": "done",
   "$defs": {
     "EntityId": {
       "type": "string",
       "minLength": 1
     },
-    "UtcStamp": {
+    "RequestId": {
       "type": "string",
-      "format": "date-time",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+      "format": "uuid"
+    },
+    "AggregateVersion": {
+      "type": "integer",
+      "minimum": 1
     },
     "MoneyJPY": {
       "type": "integer",
@@ -22,588 +27,1980 @@
       "minimum": 0,
       "maximum": 99999999
     },
-    "AggregateVersion": {
-      "type": "integer",
-      "minimum": 1
+    "UtcStamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
     },
-    "OutboxRevision": {
-      "type": "integer",
-      "minimum": 1
+    "LocalDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(19[7-9]\\d|[2-9]\\d{3})-\\d{2}-\\d{2}$"
+    },
+    "TimeZone": {
+      "type": "string",
+      "minLength": 1
     },
     "Memo": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "x-graphemeMaxLength": 100
-    },
-    "Error": {
-      "type": "object",
-      "properties": {
-        "error": {
+      "anyOf": [
+        {
           "type": "string",
-          "enum": [
-            "ValidationFailed",
-            "NotFound",
-            "VersionConflict",
-            "InvariantViolation",
-            "Busy",
-            "StorageFailure",
-            "TransportFailure",
-            "UndoExpired",
-            "OwnerMismatch",
-            "CursorInvalidated",
-            "UnsupportedVersion"
-          ]
-        },
-        "retryable": {
-          "type": "boolean"
-        },
-        "field": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "error",
-        "retryable"
-      ],
-      "additionalProperties": false
-    },
-    "ExpenseChange": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "expense_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            },
-            "amount": {
-              "$ref": "shared.schema.json#/$defs/MoneyJPY"
-            },
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "spent_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "memo": {
-              "$ref": "shared.schema.json#/$defs/Memo"
-            },
-            "payment_method": {
-              "enum": [
-                "cash",
-                "applePay",
-                "creditCard",
-                "eMoney",
-                "other"
-              ]
-            },
-            "source": {
-              "enum": [
-                "manual",
-                "apple_pay"
-              ]
-            },
-            "external_tx_id": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "required": [
-            "expense_id",
-            "updated_at",
-            "is_deleted",
-            "revision",
-            "amount",
-            "category_id",
-            "spent_at",
-            "memo",
-            "payment_method",
-            "source",
-            "external_tx_id"
-          ],
-          "additionalProperties": false
+          "x-graphemeMaxLength": 100
         },
         {
-          "type": "object",
-          "properties": {
-            "expense_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            }
-          },
-          "required": [
-            "expense_id",
-            "updated_at",
-            "is_deleted",
-            "revision"
-          ],
-          "additionalProperties": false
+          "type": "null"
         }
       ]
     },
-    "CategoryChange": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            },
-            "name": {
-              "type": "string",
-              "minLength": 1,
-              "x-graphemeMaxLength": 20
-            },
-            "icon_key": {
+    "CategoryName": {
+      "type": "string",
+      "minLength": 1,
+      "x-graphemeMaxLength": 20
+    },
+    "PaymentMethod": {
+      "type": "string",
+      "enum": [
+        "cash",
+        "applePay",
+        "creditCard",
+        "eMoney",
+        "other"
+      ]
+    },
+    "Source": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "apple_pay"
+      ]
+    },
+    "ExpenseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/EntityId"
+        },
+        "amount": {
+          "$ref": "#/$defs/MoneyJPY"
+        },
+        "categoryId": {
+          "$ref": "#/$defs/EntityId"
+        },
+        "spentAt": {
+          "$ref": "#/$defs/UtcStamp"
+        },
+        "paymentMethod": {
+          "$ref": "#/$defs/PaymentMethod"
+        },
+        "memo": {
+          "$ref": "#/$defs/Memo"
+        }
+      },
+      "required": [
+        "id",
+        "amount",
+        "categoryId",
+        "spentAt",
+        "paymentMethod",
+        "memo"
+      ]
+    },
+    "ExpenseChanges": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/MoneyJPY"
+        },
+        "categoryId": {
+          "$ref": "#/$defs/EntityId"
+        },
+        "spentAt": {
+          "$ref": "#/$defs/UtcStamp"
+        },
+        "paymentMethod": {
+          "$ref": "#/$defs/PaymentMethod"
+        },
+        "memo": {
+          "$ref": "#/$defs/Memo"
+        }
+      },
+      "required": [],
+      "minProperties": 1
+    },
+    "ExpenseView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/EntityId"
+        },
+        "amount": {
+          "$ref": "#/$defs/MoneyJPY"
+        },
+        "categoryId": {
+          "$ref": "#/$defs/EntityId"
+        },
+        "spentAt": {
+          "$ref": "#/$defs/UtcStamp"
+        },
+        "paymentMethod": {
+          "$ref": "#/$defs/PaymentMethod"
+        },
+        "memo": {
+          "$ref": "#/$defs/Memo"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "externalTxId": {
+          "anyOf": [
+            {
               "type": "string",
               "minLength": 1
             },
-            "color_hex": {
-              "type": "string",
-              "pattern": "^#[0-9A-Fa-f]{6}$"
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "amount",
+        "categoryId",
+        "spentAt",
+        "paymentMethod",
+        "memo",
+        "source",
+        "externalTxId",
+        "version"
+      ]
+    },
+    "Category": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "$ref": "#/$defs/CategoryName"
+        },
+        "iconKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "colorHex": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "isSystem": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "iconKey",
+        "colorHex",
+        "sortOrder",
+        "isSystem"
+      ]
+    },
+    "CatalogView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Category"
+          }
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "categories",
+        "version"
+      ]
+    },
+    "Allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "categoryId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allocatedAmount": {
+          "$ref": "#/$defs/AllocationYen"
+        }
+      },
+      "required": [
+        "categoryId",
+        "allocatedAmount"
+      ]
+    },
+    "BudgetPlanView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "monthlyAmount": {
+          "$ref": "#/$defs/MoneyJPY"
+        },
+        "startDay": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 28
+        },
+        "allocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Allocation"
+          }
+        },
+        "notificationEnabled": {
+          "type": "boolean"
+        },
+        "categoryBudgetEnabled": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "monthlyAmount",
+        "startDay",
+        "allocations",
+        "notificationEnabled",
+        "categoryBudgetEnabled",
+        "version"
+      ]
+    },
+    "BudgetSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "periodStart": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "periodEndExclusive": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "totalSpent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "remainingBudget": {
+          "type": "integer"
+        },
+        "dailyRecommended": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "projectedTotalExpense": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "daysTotal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "daysPassed": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "daysRemaining": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "isOverBudget": {
+          "type": "boolean"
+        },
+        "isProjectedToOverspend": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "periodStart",
+        "periodEndExclusive",
+        "totalSpent",
+        "remainingBudget",
+        "dailyRecommended",
+        "projectedTotalExpense",
+        "daysTotal",
+        "daysPassed",
+        "daysRemaining",
+        "isOverBudget",
+        "isProjectedToOverspend"
+      ]
+    },
+    "ThresholdDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notificationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threshold": {
+          "enum": [
+            80,
+            100
+          ]
+        },
+        "periodStart": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "shouldNotify": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "notificationId",
+        "threshold",
+        "periodStart",
+        "shouldNotify"
+      ]
+    },
+    "DailyExpenseSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "categoryBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "categoryId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 0
+              }
             },
-            "sort_order": {
+            "required": [
+              "categoryId",
+              "amount"
+            ]
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpenseView"
+          }
+        },
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "budgetHint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BudgetSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "date",
+        "total",
+        "categoryBreakdown",
+        "items",
+        "snapshotId",
+        "budgetHint"
+      ]
+    },
+    "HistoryFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "categoryIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Source"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timeZone": {
+          "$ref": "#/$defs/TimeZone"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LocalDate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "month",
+        "keyword",
+        "categoryIds",
+        "source",
+        "timeZone"
+      ]
+    },
+    "HistoryPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpenseView"
+          },
+          "maxItems": 50
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor",
+        "snapshotId"
+      ]
+    },
+    "HistoryTotals": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monthTotal": {
+          "anyOf": [
+            {
               "type": "integer",
               "minimum": 0
             },
-            "is_system": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted",
-            "revision",
-            "name",
-            "icon_key",
-            "color_hex",
-            "sort_order",
-            "is_system"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted",
-            "revision"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "AllocationChange": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            },
-            "allocated_amount": {
-              "$ref": "shared.schema.json#/$defs/AllocationYen"
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted",
-            "revision",
-            "allocated_amount"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted",
-            "revision"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "BudgetChange": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "budget_id": {
-              "const": "current"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            },
-            "monthly_amount": {
-              "$ref": "shared.schema.json#/$defs/MoneyJPY"
-            },
-            "start_day": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 28
-            },
-            "is_category_budget_enabled": {
-              "type": "boolean"
-            },
-            "is_alert_notification_enabled": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "budget_id",
-            "updated_at",
-            "is_deleted",
-            "revision",
-            "monthly_amount",
-            "start_day",
-            "is_category_budget_enabled",
-            "is_alert_notification_enabled"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "budget_id": {
-              "const": "current"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            },
-            "revision": {
-              "$ref": "shared.schema.json#/$defs/OutboxRevision"
-            }
-          },
-          "required": [
-            "budget_id",
-            "updated_at",
-            "is_deleted",
-            "revision"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "PushRequest": {
-      "type": "object",
-      "properties": {
-        "schema_version": {
-          "const": 2
-        },
-        "user_id": {
-          "$ref": "shared.schema.json#/$defs/EntityId"
-        },
-        "expenses": {
-          "type": "array",
-          "items": {
-            "$ref": "shared.schema.json#/$defs/ExpenseChange"
-          }
-        },
-        "categories": {
-          "type": "array",
-          "items": {
-            "$ref": "shared.schema.json#/$defs/CategoryChange"
-          }
-        },
-        "category_budgets": {
-          "type": "array",
-          "items": {
-            "$ref": "shared.schema.json#/$defs/AllocationChange"
-          }
-        },
-        "budget": {
-          "oneOf": [
-            {
-              "$ref": "shared.schema.json#/$defs/BudgetChange"
-            },
             {
               "type": "null"
             }
           ]
+        },
+        "dayTotals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "$ref": "#/$defs/LocalDate"
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "date",
+              "total"
+            ]
+          }
+        },
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": [
-        "schema_version",
-        "expenses",
-        "categories",
-        "category_budgets"
-      ],
-      "additionalProperties": false
+        "count",
+        "total",
+        "monthTotal",
+        "dayTotals",
+        "snapshotId"
+      ]
     },
-    "Ack": {
+    "DeletionView": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "entity_type": {
-          "enum": [
-            "expenses",
-            "categories",
-            "category_budgets",
-            "budget"
-          ]
-        },
         "id": {
-          "$ref": "shared.schema.json#/$defs/EntityId"
+          "type": "string",
+          "minLength": 1
         },
-        "revision": {
-          "$ref": "shared.schema.json#/$defs/OutboxRevision"
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "undoGrant": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "entity_type",
         "id",
-        "revision"
-      ],
-      "additionalProperties": false
-    },
-    "Conflict": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "entity_type": {
-              "const": "expenses"
-            },
-            "id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "server_value": {
-              "$ref": "shared.schema.json#/$defs/ExpenseRecord"
-            }
-          },
-          "required": [
-            "entity_type",
-            "id",
-            "server_value"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "entity_type": {
-              "const": "categories"
-            },
-            "id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "server_value": {
-              "$ref": "shared.schema.json#/$defs/CategoryRecord"
-            }
-          },
-          "required": [
-            "entity_type",
-            "id",
-            "server_value"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "entity_type": {
-              "const": "category_budgets"
-            },
-            "id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "server_value": {
-              "$ref": "shared.schema.json#/$defs/AllocationRecord"
-            }
-          },
-          "required": [
-            "entity_type",
-            "id",
-            "server_value"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "entity_type": {
-              "const": "budget"
-            },
-            "id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "server_value": {
-              "$ref": "shared.schema.json#/$defs/BudgetRecord"
-            }
-          },
-          "required": [
-            "entity_type",
-            "id",
-            "server_value"
-          ],
-          "additionalProperties": false
-        }
+        "version",
+        "undoGrant"
       ]
     },
-    "PushResponse": {
+    "RetirementView": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "accepted": {
-          "type": "array",
-          "items": {
-            "$ref": "shared.schema.json#/$defs/Ack"
-          }
+        "categoryId": {
+          "type": "string",
+          "minLength": 1
         },
-        "conflicts": {
-          "type": "array",
-          "items": {
-            "$ref": "shared.schema.json#/$defs/Conflict"
-          }
+        "version": {
+          "type": "integer",
+          "minimum": 1
         },
-        "server_cursor": {
+        "movedExpenseCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "categoryId",
+        "version",
+        "movedExpenseCount"
+      ]
+    },
+    "ThresholdDecisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ThresholdDecision"
+      }
+    },
+    "RecordExpenseInput": {
+      "$ref": "#/$defs/ExpenseInput"
+    },
+    "ModifyExpenseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "changes": {
+          "$ref": "#/$defs/ExpenseChanges"
+        }
+      },
+      "required": [
+        "id",
+        "expectedVersion",
+        "changes"
+      ]
+    },
+    "DeleteExpenseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "explicit",
+            "swipe"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "expectedVersion",
+        "kind"
+      ]
+    },
+    "RestoreExpenseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "grant": {
           "type": "string",
           "minLength": 1
         }
       },
       "required": [
-        "accepted",
-        "conflicts",
-        "server_cursor"
-      ],
-      "additionalProperties": false
+        "grant"
+      ]
     },
-    "PullResponse": {
+    "ConfigureBudgetPlanInput": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "expenses": {
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monthlyAmount": {
+          "$ref": "#/$defs/MoneyJPY"
+        },
+        "startDay": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 28
+        },
+        "allocations": {
           "type": "array",
           "items": {
-            "$ref": "shared.schema.json#/$defs/ExpenseRecord"
+            "$ref": "#/$defs/Allocation"
           }
         },
-        "categories": {
+        "notificationEnabled": {
+          "type": "boolean"
+        },
+        "categoryBudgetEnabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "expectedVersion",
+        "monthlyAmount",
+        "startDay",
+        "allocations",
+        "notificationEnabled",
+        "categoryBudgetEnabled"
+      ]
+    },
+    "UpsertCategoryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "categoryId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expectedCatalogVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "$ref": "#/$defs/CategoryName"
+        },
+        "iconKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "colorHex": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      },
+      "required": [
+        "categoryId",
+        "expectedCatalogVersion",
+        "name",
+        "iconKey",
+        "colorHex"
+      ]
+    },
+    "ReorderCatalogInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expectedCatalogVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "orderedIds": {
           "type": "array",
           "items": {
-            "$ref": "shared.schema.json#/$defs/CategoryRecord"
-          }
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "expectedCatalogVersion",
+        "orderedIds"
+      ]
+    },
+    "RetireCategoryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "categoryId": {
+          "type": "string",
+          "minLength": 1
         },
-        "category_budgets": {
-          "type": "array",
-          "items": {
-            "$ref": "shared.schema.json#/$defs/AllocationRecord"
-          }
+        "expectedCatalogVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "categoryId",
+        "expectedCatalogVersion"
+      ]
+    },
+    "EnsureDefaultCatalogInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    },
+    "EvaluateBudgetThresholdsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "asOfDate": {
+          "$ref": "#/$defs/LocalDate"
         },
-        "budget": {
-          "oneOf": [
+        "timeZone": {
+          "$ref": "#/$defs/TimeZone"
+        }
+      },
+      "required": [
+        "asOfDate",
+        "timeZone"
+      ]
+    },
+    "CommandRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RecordExpense"
+            },
+            "input": {
+              "$ref": "#/$defs/RecordExpenseInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "ModifyExpense"
+            },
+            "input": {
+              "$ref": "#/$defs/ModifyExpenseInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "DeleteExpense"
+            },
+            "input": {
+              "$ref": "#/$defs/DeleteExpenseInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RestoreExpense"
+            },
+            "input": {
+              "$ref": "#/$defs/RestoreExpenseInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "ConfigureBudgetPlan"
+            },
+            "input": {
+              "$ref": "#/$defs/ConfigureBudgetPlanInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "UpsertCategory"
+            },
+            "input": {
+              "$ref": "#/$defs/UpsertCategoryInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "ReorderCatalog"
+            },
+            "input": {
+              "$ref": "#/$defs/ReorderCatalogInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RetireCategory"
+            },
+            "input": {
+              "$ref": "#/$defs/RetireCategoryInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "EnsureDefaultCatalog"
+            },
+            "input": {
+              "$ref": "#/$defs/EnsureDefaultCatalogInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "EvaluateBudgetThresholds"
+            },
+            "input": {
+              "$ref": "#/$defs/EvaluateBudgetThresholdsInput"
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input",
+            "requestId"
+          ]
+        }
+      ]
+    },
+    "CommandResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RecordExpense"
+            },
+            "value": {
+              "$ref": "#/$defs/ExpenseView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "ModifyExpense"
+            },
+            "value": {
+              "$ref": "#/$defs/ExpenseView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "DeleteExpense"
+            },
+            "value": {
+              "$ref": "#/$defs/DeletionView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RestoreExpense"
+            },
+            "value": {
+              "$ref": "#/$defs/ExpenseView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "ConfigureBudgetPlan"
+            },
+            "value": {
+              "$ref": "#/$defs/BudgetPlanView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "UpsertCategory"
+            },
+            "value": {
+              "$ref": "#/$defs/CatalogView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "ReorderCatalog"
+            },
+            "value": {
+              "$ref": "#/$defs/CatalogView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RetireCategory"
+            },
+            "value": {
+              "$ref": "#/$defs/RetirementView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "EnsureDefaultCatalog"
+            },
+            "value": {
+              "$ref": "#/$defs/CatalogView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "EvaluateBudgetThresholds"
+            },
+            "value": {
+              "$ref": "#/$defs/ThresholdDecisions"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "requestId": {
+              "$ref": "#/$defs/RequestId"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration",
+            "requestId"
+          ]
+        }
+      ]
+    },
+    "GetExpenseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "GetCatalogInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    },
+    "GetBudgetPlanInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    },
+    "WatchDailySummaryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "timeZone": {
+          "$ref": "#/$defs/TimeZone"
+        }
+      },
+      "required": [
+        "date",
+        "timeZone"
+      ]
+    },
+    "RefreshDailyProjectionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "timeZone": {
+          "$ref": "#/$defs/TimeZone"
+        },
+        "afterReadGeneration": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "date",
+        "timeZone"
+      ]
+    },
+    "QueryHistoryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "filter": {
+          "$ref": "#/$defs/HistoryFilter"
+        },
+        "cursor": {
+          "anyOf": [
             {
-              "$ref": "shared.schema.json#/$defs/BudgetRecord"
+              "type": "string",
+              "minLength": 1
             },
             {
               "type": "null"
             }
           ]
         },
-        "next_page_token": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "pageSize": {
+          "const": 50
+        }
+      },
+      "required": [
+        "filter"
+      ]
+    },
+    "GetHistoryTotalsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "filter": {
+          "$ref": "#/$defs/HistoryFilter"
         },
-        "server_cursor": {
+        "snapshotId": {
           "type": "string",
           "minLength": 1
         }
       },
       "required": [
-        "expenses",
-        "categories",
-        "category_budgets",
-        "budget",
-        "next_page_token",
-        "server_cursor"
-      ],
-      "additionalProperties": false
+        "filter",
+        "snapshotId"
+      ]
+    },
+    "CalculateBudgetSummaryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "asOfDate": {
+          "$ref": "#/$defs/LocalDate"
+        },
+        "timeZone": {
+          "$ref": "#/$defs/TimeZone"
+        }
+      },
+      "required": [
+        "asOfDate",
+        "timeZone"
+      ]
+    },
+    "QueryRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetExpense"
+            },
+            "input": {
+              "$ref": "#/$defs/GetExpenseInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetCatalog"
+            },
+            "input": {
+              "$ref": "#/$defs/GetCatalogInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetBudgetPlan"
+            },
+            "input": {
+              "$ref": "#/$defs/GetBudgetPlanInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "WatchDailySummary"
+            },
+            "input": {
+              "$ref": "#/$defs/WatchDailySummaryInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RefreshDailyProjection"
+            },
+            "input": {
+              "$ref": "#/$defs/RefreshDailyProjectionInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "QueryHistory"
+            },
+            "input": {
+              "$ref": "#/$defs/QueryHistoryInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetHistoryTotals"
+            },
+            "input": {
+              "$ref": "#/$defs/GetHistoryTotalsInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "CalculateBudgetSummary"
+            },
+            "input": {
+              "$ref": "#/$defs/CalculateBudgetSummaryInput"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "input"
+          ]
+        }
+      ]
+    },
+    "QueryResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetExpense"
+            },
+            "value": {
+              "$ref": "#/$defs/ExpenseView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetCatalog"
+            },
+            "value": {
+              "$ref": "#/$defs/CatalogView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetBudgetPlan"
+            },
+            "value": {
+              "$ref": "#/$defs/BudgetPlanView"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "WatchDailySummary"
+            },
+            "value": {
+              "$ref": "#/$defs/DailyExpenseSummary"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "RefreshDailyProjection"
+            },
+            "value": {
+              "$ref": "#/$defs/DailyExpenseSummary"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "QueryHistory"
+            },
+            "value": {
+              "$ref": "#/$defs/HistoryPage"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "GetHistoryTotals"
+            },
+            "value": {
+              "$ref": "#/$defs/HistoryTotals"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schemaVersion": {
+              "const": 3
+            },
+            "operation": {
+              "const": "CalculateBudgetSummary"
+            },
+            "value": {
+              "$ref": "#/$defs/BudgetSummary"
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readGeneration": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "operation",
+            "value",
+            "warnings",
+            "readGeneration"
+          ]
+        }
+      ]
     },
     "PaymentInput": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
+        "requestId": {
+          "$ref": "#/$defs/RequestId"
+        },
         "user_id": {
           "type": "string",
           "minLength": 1
@@ -611,14 +2008,11 @@
         "amount": {
           "oneOf": [
             {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 99999999
+              "$ref": "#/$defs/MoneyJPY"
             },
             {
               "type": "string",
-              "minLength": 1,
-              "description": "円記号・カンマ等を除去後JPY整数。意味検証はPAY-C01。"
+              "minLength": 1
             }
           ]
         },
@@ -636,35 +2030,111 @@
           "const": "apple_pay"
         },
         "external_tx_id": {
-          "type": [
-            "string",
-            "null"
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       },
       "required": [
+        "requestId",
         "amount"
-      ],
-      "additionalProperties": false
+      ]
     },
     "PaymentResponse": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
+        "schemaVersion": {
+          "const": 3
+        },
+        "requestId": {
+          "$ref": "#/$defs/RequestId"
+        },
         "status": {
+          "type": "string",
           "enum": [
             "created",
             "duplicate"
           ]
         },
         "expense_id": {
-          "$ref": "shared.schema.json#/$defs/EntityId"
+          "type": "string",
+          "minLength": 1
+        },
+        "readGeneration": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "status",
+        "expense_id",
+        "readGeneration"
+      ]
+    },
+    "Error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "type": "string",
+          "enum": [
+            "ValidationFailed",
+            "NotFound",
+            "VersionConflict",
+            "InvariantViolation",
+            "Busy",
+            "StorageFailure",
+            "TransportFailure",
+            "UndoExpired",
+            "OwnerMismatch",
+            "CursorInvalidated",
+            "UnsupportedVersion",
+            "PayloadTooLarge"
+          ]
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "error",
+        "retryable"
+      ]
+    },
+    "HealthResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "ok"
+        },
+        "schemaVersion": {
+          "const": 3
         }
       },
       "required": [
         "status",
-        "expense_id"
-      ],
-      "additionalProperties": false
+        "schemaVersion"
+      ]
     },
     "WindowContext": {
       "type": "object",
@@ -730,269 +2200,6 @@
         "masterDigest"
       ],
       "additionalProperties": false
-    },
-    "ExpenseRecord": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "expense_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "amount": {
-              "$ref": "shared.schema.json#/$defs/MoneyJPY"
-            },
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "spent_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "memo": {
-              "$ref": "shared.schema.json#/$defs/Memo"
-            },
-            "payment_method": {
-              "enum": [
-                "cash",
-                "applePay",
-                "creditCard",
-                "eMoney",
-                "other"
-              ]
-            },
-            "source": {
-              "enum": [
-                "manual",
-                "apple_pay"
-              ]
-            },
-            "external_tx_id": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "required": [
-            "expense_id",
-            "updated_at",
-            "is_deleted",
-            "amount",
-            "category_id",
-            "spent_at",
-            "memo",
-            "payment_method",
-            "source",
-            "external_tx_id"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "expense_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            }
-          },
-          "required": [
-            "expense_id",
-            "updated_at",
-            "is_deleted"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "CategoryRecord": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "name": {
-              "type": "string",
-              "minLength": 1,
-              "x-graphemeMaxLength": 20
-            },
-            "icon_key": {
-              "type": "string",
-              "minLength": 1
-            },
-            "color_hex": {
-              "type": "string",
-              "pattern": "^#[0-9A-Fa-f]{6}$"
-            },
-            "sort_order": {
-              "type": "integer",
-              "minimum": 0
-            },
-            "is_system": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted",
-            "name",
-            "icon_key",
-            "color_hex",
-            "sort_order",
-            "is_system"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "AllocationRecord": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "allocated_amount": {
-              "$ref": "shared.schema.json#/$defs/AllocationYen"
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted",
-            "allocated_amount"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "category_id": {
-              "$ref": "shared.schema.json#/$defs/EntityId"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            }
-          },
-          "required": [
-            "category_id",
-            "updated_at",
-            "is_deleted"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "BudgetRecord": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "budget_id": {
-              "const": "current"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": false
-            },
-            "monthly_amount": {
-              "$ref": "shared.schema.json#/$defs/MoneyJPY"
-            },
-            "start_day": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 28
-            },
-            "is_category_budget_enabled": {
-              "type": "boolean"
-            },
-            "is_alert_notification_enabled": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "budget_id",
-            "updated_at",
-            "is_deleted",
-            "monthly_amount",
-            "start_day",
-            "is_category_budget_enabled",
-            "is_alert_notification_enabled"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "budget_id": {
-              "const": "current"
-            },
-            "updated_at": {
-              "$ref": "shared.schema.json#/$defs/UtcStamp"
-            },
-            "is_deleted": {
-              "const": true
-            }
-          },
-          "required": [
-            "budget_id",
-            "updated_at",
-            "is_deleted"
-          ],
-          "additionalProperties": false
-        }
-      ]
     }
   }
 }

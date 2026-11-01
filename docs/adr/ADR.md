@@ -1,6 +1,6 @@
 # ADRインデックス
 
-- **バージョン**: v1.0.0
+- **バージョン**: v1.1.0
 - **ステータス**: done
 
 要求・設計・検証を横断する意思決定を記録する。[運用ルール](../operations/ADR.md)に従い、`/ai-docs ADR <判断の概要>` で [テンプレート](TEMPLATE.md) から作成する。
@@ -8,6 +8,8 @@
 | ID | 題名 | 対象レイヤー | 文書リンク | 文書ステータス | 決定状態 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 0001 | 既存9機能を対象として文書を整合させる | REQ/SPEC/VERIFY | [本文](0001-nine-feature-scope.md) | done | accepted |
-| 0002 | 全9機能へDDDと契約駆動設計を適用する | REQ/SPEC/VERIFY | [本文](0002-domain-contract-design.md) | done | accepted |
+| 0002 | 全9機能へDDDと契約駆動設計を適用する | REQ/SPEC/VERIFY | [本文](0002-domain-contract-design.md) | done | superseded |
+
+| 0003 | 端末DBを廃止しAWS APIへ読み書きを集約する | REQ/SPEC/VERIFY | [本文](0003-cloud-api-only.md) | done | accepted |
 
 本書のdoneは一覧のレビュー完了を示し、各判断の採用やREQ/SPEC/VERIFYの完了を意味しない。

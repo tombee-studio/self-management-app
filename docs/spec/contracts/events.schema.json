@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Iris domain events v1",
+  "title": "Iris server domain events v2",
   "x-document-status": "done",
   "oneOf": [
     {
@@ -14,7 +14,7 @@
           "const": "ExpenseRecorded"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -88,7 +88,7 @@
           "const": "ExpenseChanged"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -162,7 +162,7 @@
           "const": "ExpenseRestored"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -236,7 +236,7 @@
           "const": "ExpenseDeleted"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -285,7 +285,7 @@
           "const": "CatalogChanged"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -342,7 +342,7 @@
           "const": "CategoryRetired"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -365,18 +365,15 @@
             "targetCategoryId": {
               "const": "cat_uncategorized"
             },
-            "movedExpenseIds": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
+            "movedExpenseCount": {
+              "type": "integer",
+              "minimum": 0
             }
           },
           "required": [
             "categoryId",
             "targetCategoryId",
-            "movedExpenseIds"
+            "movedExpenseCount"
           ],
           "additionalProperties": false
         }
@@ -403,7 +400,7 @@
           "const": "BudgetPlanChanged"
         },
         "schemaVersion": {
-          "const": 1
+          "const": 2
         },
         "aggregateId": {
           "type": "string",
@@ -453,5 +450,7 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "x-document-version": "2.0.0",
+  "$id": "https://iris.example/contracts/events.schema.json"
 }

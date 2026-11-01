@@ -1,6 +1,6 @@
 # 予算設定・管理 設計
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -8,7 +8,7 @@
 
 ## ドメイン境界・モデル
 
-分類: **Budgetingの更新モデル・計算ポリシー**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)に従う。全契約はv1.0.0。既存REQの業務範囲・AC番号を維持する。
+分類: **Budgetingの更新モデル・計算ポリシー**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)のDDD方針と[ADR-0003](../../adr/0003-cloud-api-only.md)のAWS配置に従う。全契約はv2.0.0。既存REQの業務範囲・AC番号を維持する。
 
 | モデル | 所有・構成・制約 |
 | :--- | :--- |
@@ -19,13 +19,15 @@
 ### 不変条件・依存方向
 
 - 月予算・開始日・各配分はREQ範囲内。配分総額超過はWarningとして保存可能。
-- BudgetPlanとAllocation・版・Outboxを一体保存し、通知SDKを集約から呼ばない。
+- BudgetPlanとAllocation・版・DomainEventOutboxを一体保存し、通知SDKを集約から呼ばない。
 
 BudgetRepository.load/save、BudgetPeriodExpenseQueryPort、BudgetCommitPort、NotificationPort、NotificationReceiptStore、Clock/TimeZone。保存Handlerと計算Policyを分離する。
 
+アプリの画面/ControllerはHTTP Port経由でLambdaを呼ぶ。以下の集約・Repository・QueryPort・UnitOfWorkはすべてサーバー側。クライアントにDB実装を配置しない。
+
 ### 公開契約
 
-契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DB行型を公開しない。QueryのsnapshotIdとVersionは互換ではない。
+契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DynamoDB項目型を公開しない。QueryのsnapshotIdとVersionは互換ではない。各HTTP入力/出力は公開SchemaのCommandRequest/QueryRequestと対応するResultを使用する。
 
 <a id="bud-c01"></a>
 #### BUD-C01: ConfigureBudgetPlan
@@ -33,8 +35,8 @@ BudgetRepository.load/save、BudgetPeriodExpenseQueryPort、BudgetCommitPort、N
 | 契約要素 | 定義 |
 | :--- | :--- |
 | 入出力 | `ConfigureBudgetPlan{ownerId,expectedVersion,monthlyAmount,startDay,allocations,notificationEnabled,categoryBudgetEnabled} → Result<BudgetPlanView>` |
-| 事前条件 | 版一致、金額・開始日・存在するカテゴリ参照が有効 |
-| 成功後の保証・変更範囲 | Plan/配分/版/Outboxを一体保存。配分超過はWarning。成功後のみUI遷移 |
+| 事前条件 | 未設定時expectedVersion=0、既存は正の版一致。金額・開始日・有効カテゴリ参照が有効 |
+| 成功後の保証・変更範囲 | Plan/配分/版/DomainEventOutboxを一体保存。配分超過はWarning。成功後のみUI遷移 |
 | 失敗 | ValidationFailed/VersionConflict/NotFound/StorageFailure |
 | 冪等性・再試行 | 同値の適用済みはAlreadyApplied。失敗で画面入力を破棄しない |
 | 対応REQ | [AC-01](../../req/features/budget-management.md#ac-01), [AC-03](../../req/features/budget-management.md#ac-03), [AC-04](../../req/features/budget-management.md#ac-04) |
@@ -81,16 +83,14 @@ SCR-006。月間総予算1〜99,999,999円、開始日1〜28、カテゴリ配�
 
 ## SPEC-02: 構成・通知
 
-BudgetSettingsScreen → BudgetController → ConfigureBudgetPlanHandler → BudgetRepository/UoW。予算計算Policyは純粋、通知はReceipt確定後にNotificationPortへ委譲する。
-
-以下はPortのInfrastructure実装と計算/表示Policyの具体化。具象DB・通知SDKをDomainへ持ち込まない。複数の物理テーブルに分かれていても、上の集約境界と契約単位で保存する。
+BudgetSettingsScreen → RemoteCommandPort → HTTP → Lambda ConfigureBudgetPlanHandler → BudgetRepository/UnitOfWork。サーバーの計算Policyは純粋。ThresholdDecisionの受信後だけアプリの通知Adapterを呼ぶ。
 
 
-通知はflutter_local_notificationsのアダプタで発行し、権限拒否を保存失敗としない。期間開始日+閾値（80/100）をキーとする通知履歴をDBに保存する。80%以上・100%以上へ初めて到達した時に各1回通知する。同じ変更で両閾値へ到達した場合は80%・100%を順に各1回発行する。再計算・アプリ再起動で重複通知しない。通知OFF中に閾値到達した場合も履歴を記録し、ONへの変更で過去通知を大量発行しない。
+閾値判定はLambdaで行い、owner/期間開始日/閾値のreceiptを条件付きで保存する。API応答のThresholdDecisionを受けたアプリが通知を試みる。80/100へ同時到達なら各1回を順に試みる。OFF・権限拒否でもreceiptを残し過去分を再通知しない。プロセス内で通知IDを重複排除し、再起動後に旧requestIdを自動再送しない。サーバーreceipt後の端末終了/応答喪失では通知が欠け得るため配信は保証しない。
 
 ## SPEC-03: エラー・理由
 
-カテゴリ削除時は配分も削除する。DB失敗時に画面遷移・成功通知しない。予算期間の集計Streamを使用し、開始日変更で再購読する。保存後は変更した予算と同じ期間をダッシュボードで表示する。純粋な日付・計算サービスと端末通知を分離して、暦日境界・権限拒否を個別に検証できる構成にする。
+カテゴリ廃止時はBudgetPlanから配分を同じサーバー取引で除く。API失敗で画面遷移しない。開始日変更後は新しい家計期間でAPIを再取得する。日付・計算PolicyはLambda側で純粋に検証する。
 
 ## REQ対応・検証入口
 
@@ -106,4 +106,10 @@ BudgetSettingsScreen → BudgetController → ConfigureBudgetPlanHandler → Bud
 
 ## 契約検証・実装への移行
 
-[機能別検証計画](../../verification/features/budget-management.md)のTC-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+[機能別検証計画](../../verification/features/budget-management.md)のTC-R3-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+
+## API版3への適用
+
+保存・参照の配置、requestId、通信失敗、Undo期限は[共通アーキテクチャ](../architecture.md)に従う。表示・ドラフトはメモリのみで、端末内DBへの保存・参照・移行を設計に含めない。HTTP公開形式は[契約一覧](../contracts/README.md)。
+
+HTTP BUD-C01のownerIdはヘッダーから解決し、本文に重複させない。未設定Planの作成はexpectedVersion=0、初版1。BUD-C02/C03のplan/summary/periodExpensesはサーバーが同一世代でロードする内部Policy引数で、クライアントが金額集計を申告するAPIではない。

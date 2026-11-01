@@ -1,121 +1,103 @@
-# 共通アーキテクチャ: ドメインと契約
+# 共通アーキテクチャ: AWS APIとドメイン契約
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
-
-対応要求: [REQ/ARCH-01](../req/REQ.md#arch-01-ドメインモデルと契約による設計)。採用判断は[ADR-0002](../adr/0002-domain-contract-design.md)。本書はLayer 2の共通方針で、[SPEC一覧](SPEC.md)と各機能の契約が設計の正本。
+対応要求: [ARCH-01](../req/REQ.md#arch-01-ドメインモデルと契約による設計)、[ARCH-02](../req/REQ.md#arch-02-aws-api経由の読み書き)。DDD方針は[ADR-0002](../adr/0002-domain-contract-design.md)、配置・保存方式の変更は[ADR-0003](../adr/0003-cloud-api-only.md)。
 
 ## 1. 設計方法と正本
 
-DDDで業務責務・用語・整合性境界を定め、契約駆動設計で境界の振る舞いを実装前に固定する。契約駆動は公開DTO・Port・API・イベントのcontract-firstと、事前条件・事後条件・不変条件を検証するdesign by contractを含む。単にクラスをdomainフォルダへ移すことや、HTTPスキーマだけを作ることを完了条件にしない。
-
-ドメインの意味と不変条件は本書・各機能書、操作の意味は機能書の契約表、HTTPの形式は[OpenAPI](contracts/openapi.json)、イベントの形式は[イベントスキーマ](contracts/events.schema.json)、共通DTOの制約は[共通スキーマ](contracts/shared.schema.json)を正本とする。異なる正本間の矛盾は変更を止めて同じレビューで修正する。業務ルールをスキーマ検証だけに委ねない。
+DDDで責務・集約・不変条件を定め、契約駆動設計でDTO・Port・事前/事後条件・失敗保証を固定する。業務条件は各機能書、HTTP形式は[OpenAPI](contracts/openapi.json)、共通型は[JSON Schema](contracts/shared.schema.json)、内部イベントは[イベントSchema](contracts/events.schema.json)を正本とする。
 
 ## 2. 境界づけられたコンテキストと機能対応
 
-| コンテキスト/機能の種類 | 対象機能 | 所有するモデル・責務 |
-| :--- | :--- | :--- |
-| ExpenseLedger（中核） | 手動支出、日次、履歴 | Expense集約、記録・変更・削除・復元、日次/月次の読み取りモデル |
-| CategoryCatalog（支援） | カテゴリ | CategoryCatalog集約。名称の一意性・順序・未分類保護 |
-| Budgeting（支援） | 予算 | BudgetPlan集約とAllocationエンティティ、BudgetPeriod・予算計算・通知閾値判定 |
-| PaymentIntegration（統合） | 外部決済 | 外部DTOの腐敗防止層。正規化・分類、台帳の取り込み契約を呼ぶ |
-| Replication（技術的支援） | 同期 | OutboxChangeとSyncSessionプロセスマネージャ、wire DTO・競合・ack・カーソル |
-| PresentationPolicy（技術的能力） | 共通UI | WindowContext・LayoutDecision・NavigationState。業務集約を所有しない |
-| BrandAssets（技術的能力） | アイコン | IconManifest・AssetSpecとビルド時検査。業務集約を所有しない |
-
-9機能の一覧単位は維持するが、機能数とコンテキスト数を一致させない。日次・履歴にExpenseのコピー集約を作らず、ReadModelとして同じ台帳から射影する。
+| コンテキスト | 配置と責務 |
+| :--- | :--- |
+| ExpenseLedger | Lambda側。Expense集約と日次/履歴のReadModel |
+| CategoryCatalog | Lambda側。CategoryCatalog、名称一意・順序・廃止先対応 |
+| Budgeting | Lambda側。BudgetPlan/Allocation、期間計算・閾値receipt |
+| PaymentIntegration | Lambda側のACL。正規化・分類・LedgerIngestionPortへの委譲 |
+| CloudAccess | アプリ側の技術的能力。HTTP要求・応答、結果不明・再試行、接続設定。旧Replicationを置換 |
+| PresentationPolicy / BrandAssets | アプリ側の純粋Policy・UI状態とビルド時検査。業務集約なし |
 
 ```mermaid
 flowchart LR
-  UI[UI adapters] --> APP[Application handlers / Query services]
-  APP --> LEDGER[ExpenseLedger]
-  APP --> CAT[CategoryCatalog ports]
-  APP --> BUDGET[Budgeting]
-  PAY[Payment ACL] --> APP
-  APP --> PORT[Domain-owned repository ports / UnitOfWork]
-  SQL[SQLite adapters] -. implements .-> PORT
-  APP --> OUT[Transactional outbox]
-  SYNC[Replication worker] --> OUT
-  SYNC --> WIRE[Published API / event contracts]
-  APP --> PROJ[Read-model ports]
+  UI[Flutter UI] --> CA[Application / HTTP Port]
+  CA --> HTTP[HTTP Infrastructure]
+  HTTP --> GW[API Gateway HTTPS]
+  GW --> HANDLER[Lambda API adapter]
+  HANDLER --> APP[Server Application]
+  APP --> DOMAIN[Domain aggregates / policies / ports]
+  APP --> UOW[UnitOfWork port]
+  DDB[DynamoDB adapter] -. implements .-> UOW
+  DDB --> STORE[DynamoDB]
 ```
 
-コンテキスト間はID、契約DTO、公開Portで結び、他コンテキストのEntityやDBテーブルを直接変更しない。`RetireCategory`だけは既存REQの即時整合を満たすため、アプリケーションの調整役が台帳・カテゴリ・予算のPortを同じローカルUnitOfWorkへ参加させる。分散トランザクションを導入する判断ではない。
+端末に業務データのDB・永続キャッシュ・保留送信キューを置かない。表示・ドラフトはプロセスメモリのみ。結果不明の要求ID/入力もセッション内だけに保持し、再起動で自動再送しない。再起動後はAPI取得で確定データを確認する。接続先など非業務設定とOS通知は別扱い。DynamoDB SDK/資格情報をアプリへ配布せず、IAMでLambdaからのアクセスを許可する。
 
 ## 3. ユビキタス言語・値オブジェクト
 
-| 型 | 意味と制約 |
+| 型 | 意味・制約 |
 | :--- | :--- |
-| ExpenseId / CategoryId / OwnerId | 空でない識別子。新規業務IDはUUID、既存の固定カテゴリIDを保持 |
-| MoneyJPY | 支出は1〜99,999,999の整数。残額・集計は別型SignedYen/TotalYenで負値や単一明細上限超過を表現し、集計に支出上限を流用しない |
-| AllocationYen | 0〜99,999,999の整数。配分合計超過はWarningで、BudgetPlanの不変条件違反にはしない |
-| Memo | trim・改行の空白化後100grapheme以内、空値は内部None/通信null |
-| CategoryName | trim後1〜20grapheme、NFKC・lowercase後のキーで同名を判定。元の表示名は保持する |
-| SearchText / MerchantKey | NFKC・lowercase・trim。検索と取り込みの比較用であり、表示名を置き換えない |
-| SpentAt / Instant | UTCミリ秒で保持。支出のローカル日付は1970-01-01以降。端末TimeZoneを注入し、日次は[start,nextStart) |
-| CalendarMonth / BudgetPeriod | 前者は暦月、後者は開始日1〜28を基準とした家計期間。相互に代用しない |
-| AggregateVersion | 正の整数、集約単位でCASする版。updatedAtやOutboxRevisionと区別し、削除後も版メタデータを保持 |
-| UpdateStamp / OutboxRevision | 前者はレプリカのLWW用UTC時刻、後者は端末内送信単位の整数。revisionを別端末の集約版と比較しない |
-| UndoGrant | 対象ID・削除版・元明細・期限を持つプロセス内許可。削除後5秒未満、同じ削除版、未使用の場合のみ復元可能。再起動で失効 |
-
-CategoryNameとSearchTextは型と用途を分離し、いずれもNFKC・lowercase・trimを用いる。全9機能のデータ制約はREQを上位とし、既存名の読み替え・移行ではIDと明細を失わない。
+| ExpenseId / CategoryId / OwnerId | 空でないID。新規業務IDはUUID。固定カテゴリIDを維持 |
+| MoneyJPY / AllocationYen | 支出1〜99,999,999整数、配分0〜99,999,999整数。合計・残額は別型 |
+| Memo | trim・改行空白化後100grapheme以内、空値はnull |
+| CategoryName | trim後1〜20grapheme。NFKC/lowercaseのnameKeyで一意判定 |
+| SearchText / MerchantKey | NFKC/lowercase/trim。表示値と区別 |
+| Instant / LocalDate / TimeZone | 通信はUTCミリ秒。端末のIANA timeZoneを明示し、日界は[start,nextStart) |
+| CalendarMonth / BudgetPeriod | 暦月と開始日1〜28の家計期間を区別 |
+| AggregateVersion | サーバー集約の正の整数。CASに使用し、削除後も保持 |
+| RequestId | コマンドのUUID。再送時に変更しない。Owner/操作/正規化入力と結合 |
+| SnapshotId | ownerのreadGenerationとフィルタ指紋を結ぶ不透明トークン。集約版と別 |
+| UndoGrant | サーバー保存の不透明トークン。削除版・元内容・使用状態を持つ |
 
 ## 4. レイヤー・依存方向・配置
 
-```text
-lib/features/<context>/
-  domain/          # aggregates, value_objects, policies, repository_ports
-  application/     # command/query DTO, handlers, UnitOfWork coordination
-  infrastructure/  # drift, HTTP, SDK, native adapter, DTO mapper
-  presentation/    # Flutter widgets, Riverpod controllers, view models
-```
+アプリ: presentation → application → API Port。InfrastructureがHTTP Port・通知・設定Portを実装しProviderで注入する。端末側にRepositoryのDB実装は置かない。
 
-DomainはDart標準型と自コンテキストの抽象型だけへ依存し、Flutter・Riverpod・drift・HTTP・SharedPreferences・通知SDKをimportしない。ApplicationはDomainとPortを利用し、具象DBをnewしない。InfrastructureがPortを実装し、Composition RootのProviderで注入する。表示はApplicationへ依存し、SQLのselect/updateや外部HTTPを直接呼ばない。
+サーバー: API adapter → Application Handler → Domain/owned ports。InfrastructureがDynamoDB Repository・UnitOfWork・イベント配送を実装する。DomainはFlutter/Riverpod/AWS SDK/HTTPへ依存しない。既存terraform/lambda/index.jsは移行元であり、目標はserver/{domain,application,infrastructure,api}相当の分離。言語・ファイル配置は実装時にこの依存方向を守って具体化する。
 
-既存featureディレクトリは一括移動せず段階的に移行してよいが、依存方向は守る。`ExpenseRepository`等の名前はDomain所有のPortを意味し、driftをimportする具象実装は`DriftExpenseRepository`等とする。ReadModelは専用QueryPortで効率よく結合・集計してよく、読み取りのために全Aggregateを復元しない。
+ReadModelもサーバーQueryPortから返す。SDK項目・Entityを公開DTOへ流用せずmapperを介する。
 
 ## 5. 契約の共通規則
 
-全契約IDは`<機能略号>-Cnn`、契約版は1.0.0。各表は入力/出力、事前条件、事後条件、不変条件/副作用の範囲、失敗、冪等性を含む。入力型の詳細は機能書、wire形式はスキーマへ対応付ける。
+現行の操作契約はv2.0.0、HTTPはschemaVersion=3。破壊的変更として旧wire版2を置換し、旧/sync/push・/sync/pullは現行APIに含めない。既存IDの削除は機能書の廃止表で追跡する。内部イベントschemaVersion=2へ改訂する（CategoryRetired payload変更）。
 
-- `Result<T>` = Success(value, aggregateVersion?, warnings[]) または Failure(code, field?, retryable)。UI文言・例外スタックを公開契約に含めない。
-- ValidationFailed=400/再試行不可、NotFound=404/再取得が必要、VersionConflict=409/最新版再取得、InvariantViolation=400/入力訂正、Busy=409/待機再試行、StorageFailure=500/同じIDで再試行、TransportFailure=503/接続後再試行、UndoExpired=400。HTTP以外も同じコード意味を用いる。
-- precondition違反は公開境界でResultへ変換し、リリース時に無効化されるassertへ依存しない。値オブジェクトと集約でも不変条件を保護する。
-- ローカル更新は集約版の比較→状態遷移→集約/版/DomainEventOutbox/SyncOutboxと読み取り世代を同じUnitOfWorkでcommitする。commit前の失敗は業務状態・版・Outboxを変更せず、イベントも通知も発行しない。通知のような外部副作用はcommit後に実行する。
-- 再試行は同じ業務ID/入力/expectedVersionを使う。同じ値が適用済みならAlreadyAppliedを成功として返し、別値ならVersionConflict。成功イベントの二重追加をしない。削除の再送はAlreadyDeletedで、UndoGrantを再発行しない。
-- Queryは業務状態・版・Outboxを変更しない。画面の選択状態やキャッシュだけを更新してよい。失敗を空集合へ変換しない。
-- 同期は例外的に段階的commitを持つ。ACK済みの送信revisionや適用済みページは残してよいが、全ページ成功までカーソル・lastSuccessを進めない。古いACKで新revisionを削除しない。
+- Result<T>はSuccess(value,warnings,readGeneration,aggregateVersion?)またはFailure(error,field?,retryable)。HTTPの正式表現はSchemaを使う。
+- 共通エラー: ValidationFailed/InvariantViolation/UnsupportedVersion=400、NotFound=404、OwnerMismatch=403、VersionConflict/Busy/CursorInvalidated=409、UndoExpired=410、PayloadTooLarge=413、StorageFailure=500、TransportFailure=503。HTTP以外の型も同じ意味。
+- 保存成功はサーバーcommit確定応答後だけ。アプリはフォームを保持して保存中を表示し、二重操作を無効化。通信なしでは保存しない。タイムアウトは失敗確定ではなくUnknownOutcomeと表示し、同じrequestId/入力で再送する。
+- DynamoDBのCommandReceipt(ownerId,requestId)に操作名・正規化入力のSHA-256・元の応答を保存する。業務状態・版・readGeneration・DomainEventOutbox・Receiptを同一TransactWriteItemsで確定する。Receiptは受信直後に確認する。requestIdの入力比較は省略フィールドを含む受信入力のcanonical JSONで行い、正規化した値と初回受信日時をReceiptへ保存する。日時省略を再送時の現在時刻で再評価しない。同じID/入力の再送は元の応答を返し、異なる入力は409。receiptは自動消去しない。要求IDを変えて結果不明の操作を再送しない。
+- expectedVersionはサーバーでCAS。端末updatedAtによるLWWを採用しない。Queryは業務状態・集約版・イベントを書き換えない。
+- Query/変更成功後は必要画面をAPIから再取得する。起動/復帰/明示更新でも取得。通信失敗で0件にせず、メモリ内の前回表示に未更新・再試行を表示する。再起動後に通信不可ならエラー画面。自動ポーリング/プッシュ通知による端末間リアルタイム更新は要求しない。
 
 ## 6. 集約間整合・イベント・Port
 
-`LedgerCommitPort`、`CatalogCommitPort`、`BudgetCommitPort`は`UnitOfWork.run`へ参加し、同じローカルDBで原子的にcommitできる。CategoryLookupは同じスナップショットでカテゴリの存在/版を検証する。カテゴリ削除と同時の支出保存はカタログ版のCASでどちらかを再取得にする。
+ExpenseRepository、CategoryCatalogRepository、BudgetRepositoryはサーバーDomain所有。UnitOfWorkはDynamoDB条件付き取引を実装する。状態を変えるCommandはownerのReadGenerationをCASで1進め、カテゴリ参照に使ったCatalog版も取引で確認する。初回世代/Plan作成は属性不存在を条件に行う。業務状態を変えない既適用操作はReceiptだけを世代ConditionCheckと共に保存し、集約版/世代/イベントを増やさない。競合は入力を保持して再取得へ誘導する。
 
-保存後にExpenseRecorded/ExpenseChanged/ExpenseDeleted/ExpenseRestored、CatalogChanged/CategoryRetired、BudgetPlanChangedを発行する。イベントenvelopeはeventId・eventType・schemaVersion・aggregateId・aggregateVersion・occurredAt・payload。eventIdは集約ID/版/種類から一意に生成し、原子的保存済みのDomainEventOutboxだけを配送する。DomainEventOutboxはeventIdで追記し、状態同期用SyncOutboxのキー単位coalesceとは分離する。配送はat-least-once、副作用を持つconsumerはeventIdまたは処理済み集約版/期間閾値receiptで永続的に重複排除する。状態を全件再取得するUI射影は同じ版の再取得を同値へ収束させる。UI射影は再取得できるため失敗時に台帳を巻き戻さない。
+カテゴリ廃止で任意件数のExpenseを一度に更新する取引は作らない。CatalogにretiredCategoryId→cat_uncategorizedの恒久対応を残し、同じ取引で有効Catalogから除外・BudgetPlanの配分削除・各版と世代・イベント・Receiptを更新する。Expenseロード/ReadModel/検索/集計は常に有効カテゴリを解決する。これで既存支出の未分類化を一体で可視化し、金額・ID・日時を保持する。廃止IDの再利用は禁止。任意の明細件数でも取引件数は増えない。
 
-外部の決済DTOはPayment ACLで検証・変換し、rawPayloadを台帳へ保存しない。外部イベントは公開イベントではなくInput DTOであり、envelopeへそのまま流用しない。同期wireのLWWデータと内部ドメインイベントも別契約とする。
+CatalogとBudgetPlanの各DynamoDB項目のエンコード後サイズ上限は150KiB。超過は413で変更前に拒否する。各コマンドの取引は最大20項目・合計1MiB以内に固定し、同一項目へ複数の取引操作を発行しない。容量条件はprovider契約テストで確認する。
 
-## 7. DB・API・UIとの対応
+DomainEventOutboxはサーバーの追記型イベント保存。イベントIDは集約ID/版/種類から生成し、commit後に配送する。配送はat-least-once、consumerはeventId/期間閾値receiptで重複排除。端末の同期Outboxは存在しない。イベント形式とHTTP DTOを混同しない。
 
-既存のSQLiteテーブルはInfrastructureの保存形式で、集約やDTOそのものではない。[共通データモデル](SPEC.md#共通データモデル目標スキーマ版3)で物理対応を管理する。`AggregateVersions(context,aggregateId,version,updatedAt)`を追加し、Expense・CategoryCatalog・BudgetPlanの版を原子的に更新する。Expenseを物理削除しても対応版は保持し、古い編集/復元を検出する。
+<a id="arch-storage"></a>
+## 7. DynamoDB・API・UIとの対応
 
-今回の設計目標はDB版3。作業途中の版2が存在し得るため、版1→2の既存移行を保持してから版2→3で集約版・DomainEventOutbox・ReadProjectionStateを追加する。版2の明細は版1で初期化せず、各既存集約をversion=1として登録する。移行失敗時は全体を戻し、再起動で再試行できること。
+データモデルは[SPEC](SPEC.md#dynamodb-model)を正本とする。SDKのStrongly consistent readを使い、Queryでowner世代を前後に強整合読取する。その間の全データページ取得とCatalog/Budget読取後、世代が一致した場合だけ応答する。GSIや結果整合読取をスナップショット保証の根拠にしない。世代が変化した場合は最大2回再取得し、なお変化ならBusy。
 
-UIはDTO/ViewModelを描画し、成功時だけ閉じる・遷移する。機能固有のSnapshotMismatch・UnsupportedSource・AssetMissing等は各契約表のResultコードとし、HTTP境界では公開ErrorスキーマのValidationFailed等へ明示的に変換する。
+HistoryCursor/SnapshotIdはowner・条件指紋・readGeneration・最後の(spentAt,id)・timeZoneを含めHMAC署名しクライアントが改変できない不透明値とする。期限は発行後15分。別owner/条件/期限/世代不一致はCursorInvalidated。ページと合計を同じ世代で返し、世代変更時は先頭から再取得する。生のDynamoDB LastEvaluatedKeyを公開しない。
 
-VersionConflictは入力を保持して最新版確認へ誘導する。既存8画面の配置・金額/期間/検索/閾値600/840は維持し、コンポーネント仕様に対応契約IDを記載する。
+取得はownerパーティションの全ページを強整合Queryし、サーバーで期間・正規化検索・有効カテゴリ・sourceを絞り、安定順に並べる。ページサイズ50はAPI応答の件数であり集計対象を50件へ制限しない。月500円は目標で、データ量に比例する読取コスト・レイテンシーを測定する。Lambdaの実行期限またはAPI応答サイズ予算内で全件取得/応答ができなければBusyを返し、部分合計を成功にしない。
 
-## 8. 契約の進化と検証
+スワイプ削除はcommit後に非表示。削除応答受領後に5秒のUndo UIを表示する。Restoreは同Grantを使い、サーバー受信が削除commitから30秒未満で、削除版一致・未使用なら復元する。30秒は配送遅延余裕でUIの5秒を延長しない。Grantと元内容はサーバーに保持し、TTL削除時刻に依存せず期限を検査。復元時のカテゴリが廃止済みなら未分類へ解決し、古いカテゴリを再有効化しない。期限切れは410、応答喪失の再送はReceiptを先に確認する。
 
-内部契約・イベントは意味的バージョンで管理する。必須項目追加、意味・エラー/不変条件・冪等性の変更は破壊的変更としてmajorを上げ、同じ契約IDの改訂履歴と対応consumerを記録する。wireはschema_version=2を維持し、現行v1互換の読み替えはACLだけに置く。DB版3とwire版2は別の版管理。
+## 8. 契約の移行と検証
 
-各Portのfake/SQLite/HTTP実装に同じprovider契約テストを実行する。consumerは送受信fixtureをスキーマ検証し、事前条件違反で副作用ゼロ、不変条件の境界、CAS競合、同一要求再送、タイムアウト/部分失敗を検証する。共通UI・アイコンも純粋関数/ビルド検査の入力と保証を契約テストする。計画・結果は[VERIFY](../verification/VERIFY.md)で管理し、文書のdoneを実装済み・テストPASSの証拠にしない。
+既存のSQLiteコード・Terraform/Lambdaは移行元であり適合済みではない。旧端末DBの移行・自動アップロード・消去を本設計に含めない。既存クラウド項目はデプロイ前にサーバー専用移行で版・メタデータ・Catalog/Planを作成し、件数/金額/ID/参照を比較する。移行中は書込停止し、完了検証後にAPI版3を有効化。失敗時はバックアップへ戻し旧APIを維持する。旧APIの書込を停止してから新アプリを切り替え、混在書込を許可しない。
 
-### 読み取りスナップショットとイベント保存
+認証方式の追加は今回対象外。固定OwnerIdは認証資格ではなく、APIキー/Authorizerは定義しない。単一所有者・非公開サービスの従来制約を継承し、公開運用に必要な認証の解決を本設計完了と混同しない。
 
-`ReadProjectionState(projectionId,generation)`をローカルDBに置き、Ledger/Catalog/Budgetの関連更新・Replica適用と同じUnitOfWorkでgenerationを1進める。ReadModelは同じ読取トランザクションでデータとgenerationを取得し、snapshotIdを返す。HistoryCursorは条件指紋/generation/最後のキーを持つ。途中でgenerationが変わった場合はCursorInvalidatedを返し、UIが先頭から再取得・ID重複排除する。MAX(aggregateVersion)を全台帳の世代として代用しない。
+[VERIFY](../verification/VERIFY.md)で依存方向、HTTP consumer/provider、DynamoDB原子性・CAS・再送・Query世代・通信なしを検証する。文書doneは実装済みを意味しない。
 
-`DomainEventOutbox(eventId,aggregateId,aggregateVersion,eventType,payloadJson,occurredAt,deliveryState)`は追記型。SyncOutboxは送信前の同一entityKeyを最新状態へ畳み込んでよいが、未配送のドメインイベントを上書きしない。ReplicaApplyはDomain不変条件と集約版を更新し、ReadProjectionStateを進め、読取再取得を通知する。同じ変更をSyncOutboxへ戻して通信ループを起こさない。
-
-カテゴリ廃止のローカルCommandは単一DB取引。リモートproviderで大量の明細を複数取引で移行する場合は廃止プロセスを永続化し、明細移行・配分削除が完了するまでカテゴリtombstoneのACKを返さない。途中はカテゴリを参照可能なまま維持し、失敗後の再試行を冪等にする。ローカルの原子的保証を分散システム全体の原子的保証だと解釈しない。
+内部PolicyのSnapshotMismatchはHTTPでCursorInvalidated、UnsupportedSourceはValidationFailedへ変換する。サーバーエラー詳細・rawPayload・SDK項目を公開しない。

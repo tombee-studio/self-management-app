@@ -1,167 +1,104 @@
-# クラウド同期 設計
+# クラウドデータアクセス 設計
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
-対応要求: [REQ](../../req/features/aws-cloud-database-sync.md)。設計の正本は本書。
+対応要求: [REQ](../../req/features/aws-cloud-database-sync.md)。[共通アーキテクチャ](../architecture.md)、[ADR-0003](../../adr/0003-cloud-api-only.md)に従う。
 
 ## ドメイン境界・モデル
 
-分類: **Replicationの技術的支援モデル・プロセスマネージャ**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)に従う。全契約はv1.0.0。既存REQの業務範囲・AC番号を維持する。
+CloudAccessはアプリの技術的能力で、業務集約を所有しない。RequestStateはidle/loading/saving/success/error/unknownOutcome。ConnectionSettingsはHTTPS endpointと固定owner表示。RemoteCommandPort/RemoteQueryPort/ConnectionSettingsPort/Clockを使い、HTTPと設定保存をInfrastructureへ隔離する。端末内DB・同期ワーカー・Outbox・Replica適用を置かない。
 
-| モデル | 所有・構成・制約 |
-| :--- | :--- |
-| OutboxChange（配送エンティティ） | entityKey、operation、payload、UpdateStamp、OutboxRevision。Expense等の集約自体ではない |
-| SyncSession（永続プロセス状態） | idle/pushing/pulling/success/error、送信snapshot、pageToken、cursor、lastSuccess。業務集約を所有しない |
+## 公開契約
 
-### 不変条件・依存方向
-
-- ACKはentityKeyと送信revisionの完全一致だけを除去する。
-- 未送信変更・削除を古いPullで上書きしない。全ページ成功までcursor/lastSuccessを進めない。
-- Replica適用はDomainの不変条件を迂回せず、集約版を進めるが同じ変更を再Outbox化しない。
-
-OutboxPort.snapshot/ack、SyncTransportPort.push/pull、ReplicaApplyPort、SyncSessionStore、ConnectionSettingsPort、Clock。HTTP/SQL/PreferencesをDomain/Applicationから直接importせずadapterに隔離する。
-
-### 公開契約
-
-契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DB行型を公開しない。QueryのsnapshotIdとVersionは互換ではない。
-
-<a id="syn-c01"></a>
-#### SYN-C01: RequestSync
-
-| 契約要素 | 定義 |
-| :--- | :--- |
-| 入出力 | `RequestSync{trigger:manual|startup|resume|mutation} → Result<SyncReport>` |
-| 事前条件 | manual以外はautoSyncEnabled、resumeは前回開始から5秒以上、接続先HTTPS |
-| 成功後の保証・変更範囲 | 同時実行を1本に合流。成功時だけ全工程成功時刻を表示。OFF時は自動通信0回。DBのローカル保存結果は巻き戻さない |
-| 失敗 | ValidationFailed/TransportFailure/StorageFailure。無効トリガーはSkipped |
-| 冪等性・再試行 | 同時要求は同じin-flight結果。実行中の新変更は次回snapshotへ残す |
-| 対応REQ | [AC-01](../../req/features/aws-cloud-database-sync.md#ac-01), [AC-04](../../req/features/aws-cloud-database-sync.md#ac-04), [AC-05](../../req/features/aws-cloud-database-sync.md#ac-05) |
-
-<a id="syn-c02"></a>
-#### SYN-C02: PushOutbox
-
-| 契約要素 | 定義 |
-| :--- | :--- |
-| 入出力 | `PushOutbox{ownerId,snapshot[]} → Result<PushReceipt{accepted[],conflicts[]}>` |
-| 事前条件 | wire版2/schema妥当。snapshotは変更不可 |
-| 成功後の保証・変更範囲 | server LWWを適用。古い/同時刻はserver値を返し、acceptedは送信revisionをecho。部分失敗でも未ACKを残す |
-| 失敗 | ValidationFailed/OwnerMismatch/TransportFailure/StorageFailure |
-| 冪等性・再試行 | 同じentity/updateStamp再送は追加効果なし。同時刻server優先を維持 |
-| 対応REQ | [AC-02](../../req/features/aws-cloud-database-sync.md#ac-02), [AC-03](../../req/features/aws-cloud-database-sync.md#ac-03), [AC-06](../../req/features/aws-cloud-database-sync.md#ac-06) |
-
-<a id="syn-c03"></a>
-#### SYN-C03: ApplyPullPage
-
-| 契約要素 | 定義 |
-| :--- | :--- |
-| 入出力 | `ApplyPullPage{ownerId,page,cursorContext} → Result<PageReceipt>` |
-| 事前条件 | owner/上限時刻/ページ位置が一致。未送信キーは保護対象 |
-| 成功後の保証・変更範囲 | ページ単位UoWでReplicaApplyPort経由の状態/集約版更新。削除は該当UoWへ委譲。失敗はページを戻す。Outbox echoを起こさない |
-| 失敗 | ValidationFailed/CursorInvalidated/StorageFailure |
-| 冪等性・再試行 | 同ページ再送で二重加算・新たな配送イベントを作らない |
-| 対応REQ | [AC-02](../../req/features/aws-cloud-database-sync.md#ac-02), [AC-03](../../req/features/aws-cloud-database-sync.md#ac-03), [AC-06](../../req/features/aws-cloud-database-sync.md#ac-06), [AC-07](../../req/features/aws-cloud-database-sync.md#ac-07) |
-
-<a id="syn-c04"></a>
-#### SYN-C04: CompleteSync
-
-| 契約要素 | 定義 |
-| :--- | :--- |
-| 入出力 | `CompleteSync{sessionId,allPagesApplied,serverCursor} → Result<SyncReport>` |
-| 事前条件 | Pushの応答を処理済み・全Pullページ適用済み |
-| 成功後の保証・変更範囲 | cursor/lastSuccess/session成功を一体確定。途中失敗では直前成功値を保持 |
-| 失敗 | StorageFailure/InvariantViolation |
-| 冪等性・再試行 | 同sessionの完了再送は同じ成功値 |
-| 対応REQ | [AC-05](../../req/features/aws-cloud-database-sync.md#ac-05), [AC-07](../../req/features/aws-cloud-database-sync.md#ac-07) |
-
-<a id="syn-c05"></a>
-#### SYN-C05: MigrateReplicationState
-
-| 契約要素 | 定義 |
-| :--- | :--- |
-| 入出力 | `MigrateReplicationState{sourceDbVersion,legacyDeleteIds} → Result<MigrationReport>` |
-| 事前条件 | 同期開始前。版1/2を識別しバックアップ可能 |
-| 成功後の保証・変更範囲 | 版3へデータと集約版を保持して移行。DB取り込み成功後だけ旧設定キューを除去 |
-| 失敗 | StorageFailure/UnsupportedVersion |
-| 冪等性・再試行 | 再起動で再実行しても重複Outbox・データ欠落なし |
-| 対応REQ | [AC-01](../../req/features/aws-cloud-database-sync.md#ac-01), [AC-02](../../req/features/aws-cloud-database-sync.md#ac-02) |
+操作契約v2.0.0。共通の副作用・エラー・冪等性は[共通規則](../architecture.md#5-契約の共通規則)。
 
 <a id="syn-c06"></a>
-#### SYN-C06: ValidateCostConfiguration
+### SYN-C06: ValidateCostConfiguration
 
 | 契約要素 | 定義 |
 | :--- | :--- |
 | 入出力 | `ValidateCostConfiguration{region,usageAssumptions,monthlyAlertUsd,email} → Result<CostConfigReport>` |
-| 事前条件 | 正の閾値、通知先・計測条件あり |
-| 成功後の保証・変更範囲 | 構成の妥当性だけを返す。月500円は目標で課金停止保証としない。AWSのapplyは実行しない |
-| 失敗 | ValidationFailed |
-| 冪等性・再試行 | 同構成は同じ報告。業務データへ副作用なし |
-| 対応REQ | [AC-08](../../req/features/aws-cloud-database-sync.md#ac-08) |
+| 事前条件 | 正の通知閾値・通知先・計測条件が有効 |
+| 成功後の保証・変更範囲 | 費用構成だけ検査し、AWS applyや業務データ変更を行わない |
+| 失敗 | ValidationFailed。通信失敗は入力保持 |
+| 冪等性・再試行 | 同一入力で再試行。CommandはサーバーReceiptで重複排除、Queryと設定検査は業務状態変更なし |
+| 対応REQ | AC-08 |
 
-<a id="syn-c07"></a>
-#### SYN-C07: FetchPullPage
+<a id="syn-c08"></a>
+### SYN-C08: RefreshRemoteData
 
 | 契約要素 | 定義 |
 | :--- | :--- |
-| 入出力 | `FetchPullPage{ownerId,since?,pageToken?} → Result<PullPage{records,nextPageToken?,serverCursor}>` |
-| 事前条件 | ownerとwire版2が有効。pageTokenがowner・フィルタ・取得上限を固定している |
-| 成功後の保証・変更範囲 | 同一取得上限内の変更だけを安定順で返す。LWWの更新時刻とキーを使う位置カーソルとし、更新によるoffsetずれで欠落させない。業務データを書き換えない |
-| 失敗 | ValidationFailed/OwnerMismatch/CursorInvalidated/TransportFailure/StorageFailure |
-| 冪等性・再試行 | 同pageTokenは同じ取得範囲。取得途中に更新された明細は次のsince範囲で必ず再取得できる |
-| 対応REQ | AC-02/06/07 |
+| 入出力 | `RefreshRemoteData{trigger:startup|resume|manual|mutation,resources} → Result<RefreshReport>` |
+| 事前条件 | HTTPS接続先・有効リソース。resumeは前回取得開始から5秒以上 |
+| 成功後の保証・変更範囲 | 同じ対象の実行中取得を合流。取得成功だけ最終成功日時更新。メモリ表示のみ置換 |
+| 失敗 | ValidationFailed/TransportFailure/Busy。通信失敗は入力保持 |
+| 冪等性・再試行 | 同一入力で再試行。CommandはサーバーReceiptで重複排除、Queryと設定検査は業務状態変更なし |
+| 対応REQ | AC-01/04/05 |
 
-## SPEC-01: 設定・ライフサイクル
+<a id="syn-c09"></a>
+### SYN-C09: SendRemoteCommand
 
-SCR-008。単一所有者用。既存AppConfigの接続先と固定所有者IDを初期値とし、接続先は設定で上書き可能。固定IDを認証情報として扱わず、多人数の公開サービスとして提供しない。エンドポイントはHTTPSのみ、空値・不正URLは保存不可。所有者ID変更は対象外で、読み取り専用表示に統一する。
+| 契約要素 | 定義 |
+| :--- | :--- |
+| 入出力 | `SendRemoteCommand{requestId,operation,input} → Result<CommandResult>` |
+| 事前条件 | 操作別入力とrequestIdが有効 |
+| 成功後の保証・変更範囲 | API確定後だけ成功。タイムアウトはUnknownOutcome。再送では同じID/操作/入力を使う |
+| 失敗 | ValidationFailed/VersionConflict/TransportFailure。通信失敗は入力保持 |
+| 冪等性・再試行 | 同一入力で再試行。CommandはサーバーReceiptで重複排除、Queryと設定検査は業務状態変更なし |
+| 対応REQ | AC-02/03/06/07 |
 
-起動、復帰（前回開始から5秒以上）、ローカル変更後に自動同期ONなら同期する。OFFでも変更はoutboxへ蓄積する。手動同期はON/OFFに関係なく実行可能。同時実行は1本にまとめ、実行中に追加された変更は次の同期へ残す。状態はidle/syncing/success/error、最終成功時刻はPushとPullが成功してから更新する。通信失敗時はローカル操作を巻き戻さず、次回トリガーと手動操作で再送する。
+<a id="syn-c10"></a>
+### SYN-C10: ConfigureConnection
 
-## SPEC-02: 変更追跡・順序・競合
+| 契約要素 | 定義 |
+| :--- | :--- |
+| 入出力 | `ConfigureConnection{endpoint} → Result<ConnectionView>` |
+| 事前条件 | HTTPS URL、userinfoなし |
+| 成功後の保証・変更範囲 | 接続先設定だけ保存。OwnerIdは変更不可。業務データは端末へ保存しない |
+| 失敗 | ValidationFailed。通信失敗は入力保持 |
+| 冪等性・再試行 | 同一入力で再試行。CommandはサーバーReceiptで重複排除、Queryと設定検査は業務状態変更なし |
+| 対応REQ | AC-04/05 |
 
-ローカルは物理削除、クラウドはtombstone。SyncOutboxにentityType/id、operation、payload、updatedAt、revisionを保存する。追加・更新・削除・Undo・カテゴリ移行は本体変更と同じDBトランザクションでoutboxへ登録する。通常の全件Pushやis_synced列は使用しない。初回既存データはoutboxへ登録して送信する。
+## 廃止契約の追跡
 
-1. 送信開始時にoutboxのrevision付きスナップショットを取得する。
-2. `POST /sync/push`で送信。サーバーはUTC更新時刻が新しい変更を採用。同時刻・古い変更はサーバー既存値を返す。
-3. サーバーが応答したキーと送信revisionが現在も同じ場合に限ってoutboxから除去する。送信中の新しい変更を消さない。
-4. `GET /sync/pull?since=...`で差分を取得。未送信の同一キーは保持し、その他はLWWでマージする。削除済み支出は物理削除、カテゴリ削除は未分類への移行と配分削除を行う。
-5. Pullの全ページを適用後に返却カーソルを保存する。途中失敗はカーソルを進めない。
+| 旧ID | 旧操作 | 現行の対応 |
+| :--- | :--- | :--- |
+| SYN-C01 | RequestSync | SYN-C08の画面再取得。自動同期ON/OFFは削除 |
+| SYN-C02 | PushOutbox | SYN-C09と各業務Command。Push APIを削除 |
+| SYN-C03 | ApplyPullPage | 廃止。端末にReplicaなし |
+| SYN-C04 | CompleteSync | SYN-C08/09の要求状態管理。同期カーソルなし |
+| SYN-C05 | MigrateReplicationState | 廃止。端末DB移行なし |
+| SYN-C07 | FetchPullPage | 各業務Query。Pull APIを削除 |
 
-削除・Undoはそれぞれ新しいupdatedAt/revisionを持つ。UTCミリ秒の更新時刻は端末内で前回値以上（同じなら+1ms）を生成し、端末時計のずれは状態画面で診断する。複数端末が同時刻の場合はサーバー既存値を優先し、競合を成功レスポンスで通知する。未送信データを古いPullで上書きしない。
+## SPEC-01: 画面とライフサイクル
 
-## SPEC-03: API・データモデル
+SCR-008はクラウド接続設定。組み込み接続先を初期値としHTTPS URLを上書き可能、所有者IDは読取専用。自動同期スイッチ・同期キュー・Push/Pull進捗を削除し、接続確認、表示の再取得、最終成功日時、通信結果を表示する。
 
-Push JSONは`schema_version:2,user_id,expenses,categories,category_budgets,budget`。各Push ChangeにID・updated_at・is_deleted・送信revisionを持たせる。Pull/ConflictのRecordは送信元revisionを公開しない。支出にはamount/category_id/spent_at/memo/payment_method/source/external_tx_id。カテゴリにはname/icon_key/color_hex/sort_order/is_system。配分にはcategory_id/allocated_amount。予算はid=currentと設定値。削除ChangeはID・updated_at・is_deleted=true・送信revisionを必須とする。
+起動/復帰/明示更新で表示対象のQueryを呼ぶ。保存後は応答のreadGeneration以降で必要画面を再取得する。別端末の変更は次回取得で見える。ネットワークなしはエラー、プロセスメモリ内の表示/入力は保持するが再起動後の復元を保証しない。
 
-応答は`accepted:[{entity_type,id,revision}],conflicts:[{entity_type,id,server_value}],server_cursor`。400は入力不正、所有者ID不一致は403、失敗は500。部分処理時は応答したキーだけをackする。既存v1との移行中はmerchant_nameをmemo、icon_nameをicon_keyへ読み替え、source欠落はexternal_tx_idの有無とpayment_methodを使って既存値を維持する。
+## SPEC-02: APIとサーバー処理
 
-Pullはexpenses/categories/category_budgets/budget、next_page_token、server_cursorを返す。sinceはサーバー発行カーソルで、更新時刻とIDを含む安定した境界を保持する。複数ページの取得中に新たな更新が起きても欠落させないよう取得開始時の上限時刻を固定する。サーバーのカテゴリ削除では紐づく明細の未分類化と配分削除を一つの業務変更として記録し、途中では削除完了を返さない。
+`POST /commands`はrequestId/operation/input、`POST /queries`はoperation/input、`GET /health`は接続確認、`GET/POST /payment`は決済取込。[OpenAPI](../contracts/openapi.json)と[共通Schema](../contracts/shared.schema.json)を使用する。schemaVersion=3。所有者はx-user-idか/paymentのuser_idで指定し、両方あるとき異なるならOwnerMismatch。未指定は400、許可外は403。識別子は認証資格ではない。
 
-## SPEC-04: 構成・移行・費用
+コマンドはApplication Handler → Domain Port → DynamoDB UnitOfWork。受信値だけで直接SDK更新せず、サーバーで全制約を再検証する。requestIdのReceipt・集約版CAS・世代更新・イベントを同時に確定する。更新日時はサーバーが付与する。
 
-DynamoDBは`iris_expenses`（PK=user_id, SK=expense_id）、`iris_categories`（PK=user_id, SK=category_id）、`iris_budgets`（PK=user_id, SK=budget_id）、`iris_category_budgets`（PK=user_id, SK=category_id）を用いる。各項目のupdated_atとis_deletedを保持し、tombstoneは今回の設計では自動消去しない。テーブル別の差分取得位置と上限時刻をページトークンに含める。決済の条件付きロックは`iris_sync_metadata`（PK=user_id, SK=lock_type）へ保存する。
+## SPEC-03: AWS構成・データモデル
 
-CloudSyncScreen → RequestSyncHandler/SyncSession → OutboxPort/SyncTransportPort/ReplicaApplyPort。CloudSyncApiClientとDriftの実装はInfrastructureで、原子的整合はDomain/Applicationの契約に従う。 HTTP API/Lambda/DynamoDBはtransport adapter。Terraformでテーブル・API・Lambda・IAM・費用通知を管理する。端末側は共通スキーマ版3へ移行し、既存SharedPreferencesの削除保留IDをoutboxへ取り込む。DBへの取り込み成功後のみ旧キューを消し、移行中の同期を開始しない。
+API Gateway HTTP API → Lambda → DynamoDB。IAMはLambdaの必要テーブル/操作へのアクセスを許可する。アプリからDynamoDBへの直接アクセスはない。認証方式は本変更では追加せず、単一所有者・非公開サービスの制約を継承する。
 
-月500円は運用目標。AWS Budgetsの月額通知閾値はTerraform変数とし、リージョン・利用件数・保存量・通知先とともにデプロイ時に確認する。過去の無料枠・為替・月0円試算を確定値として使わない。通知は停止制御ではない。稼働・料金は実環境で別途検証する。
+DynamoDBの保存形式・世代/receipt・カテゴリ廃止の原子性は[SPEC](../SPEC.md#dynamodb-model)と共通方針に従う。TerraformはAPI・Lambda・IAM・テーブル・費用通知を管理する。既存TerraformとLambdaはまだ旧設計のため改修対象。
 
-## SPEC-05: 異常系・理由
+## SPEC-04: 移行・費用
 
-タイムアウト・失敗でoutboxと最終成功カーソルを失わない。JSON破損はマージせずエラー表示し、ローカル明細を保持する。カテゴリ欠落の支出は未分類へ退避する。DBと変更追跡を一体化し、全件Push・設定値だけの保留キューで起きる欠落を避ける。クラウド結果はローカル保存成功と別状態で表示する。
+端末DBの自動移行・アップロード・消去は対象外。既存クラウドデータはバックアップと書込停止後にサーバー専用移行し、ID/件数/総額/カテゴリ対応を検証して版3 APIを有効化する。旧APIの混在書込を止める。失敗時はバックアップへ復帰する。
 
-## REQ対応・検証入口
+月額500円は運用目標。region/読取・書込件数/データ量/通知先/予算通知閾値をTerraform変数と計測証跡に記録する。全件検索と再取得のコストを含め、無料枠や為替の固定値で達成を保証しない。予算通知は課金停止ではない。
 
-- [aws-cloud-database-sync/AC-01](../../req/features/aws-cloud-database-sync.md#ac-01): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-02](../../req/features/aws-cloud-database-sync.md#ac-02): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-03](../../req/features/aws-cloud-database-sync.md#ac-03): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-04](../../req/features/aws-cloud-database-sync.md#ac-04): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-05](../../req/features/aws-cloud-database-sync.md#ac-05): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-06](../../req/features/aws-cloud-database-sync.md#ac-06): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-07](../../req/features/aws-cloud-database-sync.md#ac-07): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
-- [aws-cloud-database-sync/AC-08](../../req/features/aws-cloud-database-sync.md#ac-08): 本書のSPEC-01〜03およびSPEC-04〜05で具体化。
+## SPEC-05: 異常系・検証
 
-検証計画は[VERIFY一覧](../../verification/VERIFY.md)。コードが本設計に追従しているかは[実装差分](../../STATUS.md)で管理し、文書レビューのPASSを実装済み・検証済みと扱わない。
+失敗確定と結果不明を区別する。結果不明は新requestIdにせず同じ入力で再送してReceiptを得る。古いexpectedVersionは409で最新版を案内する。破損したJSONを成功や空一覧にしない。再取得に失敗しても保存commitの成功を取り消さない。
 
-## 契約検証・実装への移行
-
-[機能別検証計画](../../verification/features/aws-cloud-database-sync.md)のTC-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03〜05の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+[検証計画](../../verification/features/aws-cloud-database-sync.md)はAC-01〜08と現行4契約を検証する。旧同期ケースはGit履歴で追跡し、現在の合格として流用しない。

@@ -1,12 +1,12 @@
 # Layer 2: 設計インデックス
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
 ## 適用範囲・共通アーキテクチャ
 
-[REQ](../req/REQ.md)の全9機能を対象とし、DDDのコンテキストと契約に基づき、presentation/application/domain/infrastructureを分離する。UIはRiverpod、永続化はdrift/SQLite、クラウドはHTTP API・Lambda・DynamoDBとTerraformを用いる。型安全なローカルStreamと端末内保存を基本とし、クラウド通信の完了をUI保存の前提にしない。OS差分は通知・リンク・保存先のアダプタに閉じ込める。
+[REQ](../req/REQ.md)の全9機能を対象とする。端末はFlutter/RiverpodとHTTP Infrastructure、サーバーはAPI Gateway/Lambda/DynamoDB。業務データはAWS API経由で取得・保存し、端末内DBを置かない。保存成功はサーバー確定応答後だけ。DDDの業務モデルとRepositoryはサーバーに配置する。
 
 ## 共通の設計正本
 
@@ -20,7 +20,7 @@
 | 予算 | BudgetPlan/Allocation | BUD |
 | カテゴリ | CategoryCatalog/Category | CAT |
 | 外部決済 | ACLと取り込みApplication | PAY |
-| 同期 | OutboxChange/SyncSession | SYN |
+| クラウドデータアクセス | CloudAccess/HTTP Port | SYN |
 | 共通UI | 純粋Policy/UI状態 | UI |
 | アイコン | AssetManifest/ビルド契約 | ICON |
 
@@ -34,40 +34,33 @@
 | 予算設定・管理 | [budget-management](features/budget-management.md) | [REQ](../req/features/budget-management.md) | done |
 | カテゴリマスター管理 | [category-master-management](features/category-master-management.md) | [REQ](../req/features/category-master-management.md) | done |
 | 外部決済イベント連携 | [payment-event-ingestion](features/payment-event-ingestion.md) | [REQ](../req/features/payment-event-ingestion.md) | done |
-| クラウド同期 | [aws-cloud-database-sync](features/aws-cloud-database-sync.md) | [REQ](../req/features/aws-cloud-database-sync.md) | done |
+| クラウドデータアクセス | [aws-cloud-database-sync](features/aws-cloud-database-sync.md) | [REQ](../req/features/aws-cloud-database-sync.md) | done |
 | 共通UI・マルチデバイス対応 | [cross-platform-shared-ui](features/cross-platform-shared-ui.md) | [REQ](../req/features/cross-platform-shared-ui.md) | done |
 | アプリアイコン・ブランディング | [app-icon-branding](features/app-icon-branding.md) | [REQ](../req/features/app-icon-branding.md) | done |
 
-## 共通データモデル（目標スキーマ版3）
+<a id="dynamodb-model"></a>
+## 共通データモデル（DynamoDB）
 
-現行の版1と、作業途中の版2のDBから移行する目標設計。下記がDB上の正本であり、ローカルis_synced/is_deleted列は使用しない。
+保存形式はInfrastructure内部で、公開DTOと分離する。全テーブルのPKはownerId（user_id互換の変換は移行時だけ）。SKで項目を識別する。SDKの生項目をAPIへ返さない。
 
-| テーブル | 主キー・主な列 | 制約 |
+| テーブル | SKと主な内容 | 制約 |
 | :--- | :--- | :--- |
-| Categories | id,name,nameKey,iconKey,colorHex,sortOrder,isSystem,createdAt,updatedAt | nameKey一意。未分類を保護 |
-| Expenses | id,amount,categoryId,spentAt,memo,memoSearch,paymentMethod,source,externalTxId,createdAt,updatedAt | amount 1〜99,999,999、カテゴリ参照、source+externalTxIdはNULL以外一意 |
-| Budgets | id,monthlyAmount,startDay,isCategoryBudgetEnabled,isAlertNotificationEnabled,updatedAt | id=1の1件。開始日1〜28 |
-| CategoryBudgets | categoryId,allocatedAmount,updatedAt | categoryId参照。0円以上 |
-| SyncOutbox | entityType+entityId,operation,payloadJson,updatedAt,revision | 本体変更と同一トランザクション。送信時revisionでack |
-| NotificationHistory | periodStart+threshold,notifiedAt | 予算通知の重複防止 |
-| AggregateVersions | context+aggregateId,version,updatedAt | 集約単位のCAS。削除後も版を保持 |
-| DomainEventOutbox | eventId,aggregateId,aggregateVersion,eventType,payloadJson,occurredAt,deliveryState | 追記型のドメインイベント配送。SyncOutboxとは分離 |
-| ReadProjectionState | projectionId,generation | 業務変更と同じUoWで世代を進め、カーソルを検証 |
+| iris_expenses | expenseId、金額・カテゴリ参照・UTC日時・memo/memoSearch・支払い方法・source/externalTxId・version・isDeleted | 支出集約。削除後は版と元内容を保持 |
+| iris_categories | catalog、有効Category集合・nameKey・sortOrder・廃止先対応・version | 集約内で名称一意。未分類保護。150KiB上限 |
+| iris_budgets | current、設定・Allocation集合・version | 配分を集約内に保持。150KiB上限 |
+| iris_metadata | generation、receipt#requestId、undo#token、external#source#txId、notification#period#threshold | owner世代CAS、冪等応答、期限/単回使用、外部ID一意、通知権利 |
+| iris_domain_events | eventId、aggregateId/version・type・payload・occurredAt・deliveryState | 業務変更と同時に追記、配送済み重複排除 |
 
-日時はUTCのミリ秒精度で保持・通信する。表示・日次/月次の境界は端末ローカルの暦日で計算してUTC範囲へ変換する。範囲は開始以上・次の境界未満とする。カテゴリ参照を必須とし、未分類を起動・移行時に冪等生成する。外部店舗名はmemoへ保存し、sourceとpaymentMethodを分離する。検索用memoSearchはNFKC・lowercase・trimを適用する。
-
-### 移行
-
-onUpgradeで版1→2の列・新テーブル・インデックスの移行を保持し、版2→3でAggregateVersions・DomainEventOutbox・ReadProjectionStateを追加する。既存のExpense/CategoryCatalog/BudgetPlanへ版1を割り当てる。既存メモ・名称の正規化値を埋める。既存ID・支出・配分・予算を保持する。旧削除保留IDは同期起動前にoutboxへ取り込み、DB保存成功後だけSharedPreferencesから除く。既存データを初回outboxへ登録し、移行中に同期を起動しない。移行失敗はトランザクションを戻してエラーを表示し、DBを作り直してデータを失わせない。
+各CommandはTransactWriteItemsで状態・集約版・世代・Receipt・イベントを原子的に確定する。Queryのスナップショットは[共通アーキテクチャ](architecture.md#arch-storage)の世代検証で保証する。端末DB版・SyncOutbox・Replica用メタデータは設計から削除した。
 
 ## 共通ルール・画面
 
-- 入力制約の正本はREQ。文字数はgrapheme単位、日本円は整数。
-- 日次/履歴は暦日/暦月、予算は開始日基準の家計期間。別々の期間Providerを使用する。
-- 削除は即時物理削除とoutboxの原子的保存。クラウドはtombstone、Undoは新revisionで復元。
-- UI閾値は600/840の共通判定。詳細は[共通UI](features/cross-platform-shared-ui.md)。
-- [screens.drawio](screens.drawio)にSCR-001〜008のワイヤーフレームとコンポーネント仕様を同じキャンバスで記載する。
-- 画面は入力中/保存中/成功/失敗を区別し、失敗で入力やローカル保存済みデータを消さない。
+- JPY整数とgrapheme制約、指定timeZoneの暦日/暦月と家計期間を区別する。
+- HTTP schemaVersion=3、操作契約v2.0.0、内部イベントschemaVersion=2。旧wire版2のPush/Pullは廃止。
+- 保存/削除の確定後だけ成功表示し、関連画面をAPI再取得する。入力・直前表示はプロセスメモリのみ。
+- 結果不明の保存は同じrequestIdで再送し、集約版競合は最新版確認へ誘導する。
+- UIの600/840区分と8画面を維持。SCR-008は同期設定からクラウド接続設定へ変更する。
+- [screens.drawio](screens.drawio)と各機能書に契約を対応付ける。
 
 ## 旧14項目の対応
 
@@ -87,4 +80,4 @@ onUpgradeで版1→2の列・新テーブル・インデックスの移行を保
 
 ## 設計方式のADR
 
-[ADR-0002](../adr/0002-domain-contract-design.md)のDDD＋契約駆動方針を全9機能・共通DTO・イベントへ反映した。DB表はInfrastructureの保存形式であり、集約・公開DTOをDB生成クラスと同一視しない。
+[ADR-0002](../adr/0002-domain-contract-design.md)のDDD＋契約駆動方針を全9機能・共通DTO・イベントへ反映した。[ADR-0003](../adr/0003-cloud-api-only.md)により端末DBを廃止し、DynamoDB項目を公開DTOと分離する。

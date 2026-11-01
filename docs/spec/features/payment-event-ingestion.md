@@ -1,6 +1,6 @@
 # 外部決済イベント連携 設計
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -8,7 +8,7 @@
 
 ## ドメイン境界・モデル
 
-分類: **PaymentIntegrationの腐敗防止層と台帳取り込みApplication**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)に従う。全契約はv1.0.0。既存REQの業務範囲・AC番号を維持する。
+分類: **PaymentIntegrationの腐敗防止層と台帳取り込みApplication**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)のDDD方針と[ADR-0003](../../adr/0003-cloud-api-only.md)のAWS配置に従う。全契約はv2.0.0。既存REQの業務範囲・AC番号を維持する。
 
 | モデル | 所有・構成・制約 |
 | :--- | :--- |
@@ -19,14 +19,14 @@
 ### 不変条件・依存方向
 
 - 外部IDはsourceとの組で一意。IDなしはsource/金額/店舗キー/180秒の重複ポリシーを満たす。
-- 重複検査・作成・Outboxを同一台帳UoWで実施し、並列送信で2件作らない。
+- 重複検査・作成・DomainEventOutboxを同一台帳UoWで実施し、並列送信で2件作らない。
 - 不正入力は未確定明細として保持せず、rawPayloadを通知・ログ・台帳へ保存しない。
 
-PaymentAdapterPort、LedgerIngestionPort、CategoryClassificationPolicy/CategoryLookup、OwnerLeasePort（Lambda）、NotificationPort、Clock。HTTP/URL Adapter → IngestPaymentHandler → LedgerIngestionPort。分類Policyは純粋関数、保存は台帳Handlerが所有する。公開LedgerIngestionPortはLedger所有のImportedExpenseDraft（amount/spentAt/merchantMemo/merchantKey/source/externalTxId）を受け取り、ACLがNormalizedPaymentから変換する。
+PaymentAdapterPort、LedgerIngestionPort、CategoryClassificationPolicy/CategoryLookup、ReadGenerationPort（Lambda）、Clock。アプリのURL入力はHTTP経由でLambdaへ渡す。正規化・分類・保存判断はLambdaで実行する。Ledger所有のImportedExpenseDraft（amount/spentAt/merchantMemo/merchantKey/source/externalTxId）へACLが変換し、rawPayloadを渡さない。
 
 ### 公開契約
 
-契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DB行型を公開しない。QueryのsnapshotIdとVersionは互換ではない。
+契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DynamoDB項目型を公開しない。QueryのsnapshotIdとVersionは互換ではない。公開HTTPはPaymentInput/PaymentResponse/Errorを使用する。PAY-C01/C02はLambda内部、PAY-C04はアプリ内契約。
 
 <a id="pay-c01"></a>
 #### PAY-C01: NormalizePayment
@@ -47,7 +47,7 @@ PaymentAdapterPort、LedgerIngestionPort、CategoryClassificationPolicy/Category
 | :--- | :--- |
 | 入出力 | `IngestPayment{normalizedPayment} → Result<IngestionDecision>` |
 | 事前条件 | 正常化済み値、所有者範囲、カテゴリLookup成立 |
-| 成功後の保証・変更範囲 | 台帳UoW内で重複判定。新規のみExpense作成・版・Outbox。未知/削除済み分類先は未分類 |
+| 成功後の保証・変更範囲 | 台帳UoW内で重複判定。新規のみExpense作成・版・DomainEventOutbox。未知/削除済み分類先は未分類 |
 | 失敗 | ValidationFailed/Busy/StorageFailure |
 | 冪等性・再試行 | 外部ID再送はDuplicate、IDなしは180秒以内条件でDuplicate。新規IDを再採番して2件作らない |
 | 対応REQ | [AC-01](../../req/features/payment-event-ingestion.md#ac-01), [AC-02](../../req/features/payment-event-ingestion.md#ac-02), [AC-05](../../req/features/payment-event-ingestion.md#ac-05) |
@@ -57,11 +57,11 @@ PaymentAdapterPort、LedgerIngestionPort、CategoryClassificationPolicy/Category
 
 | 契約要素 | 定義 |
 | :--- | :--- |
-| 入出力 | `SubmitBackgroundPayment{GET/POST PaymentInputDTO} → HTTP Created|Duplicate|Error` |
-| 事前条件 | OpenAPIに一致、固定owner、POST本文優先 |
-| 成功後の保証・変更範囲 | 前面起動不要でクラウドへ保存。ローカルは後続同期で反映。lease中だけ重複検査〜保存を直列化 |
+| 入出力 | `SubmitBackgroundPayment{GET/POST PaymentInputDTO（requestId必須）} → HTTP Created|Duplicate|Error` |
+| 事前条件 | OpenAPIに一致、固定owner、POSTはJSON本文のみ |
+| 成功後の保証・変更範囲 | 前面起動不要でクラウドへ保存。一覧は次回API取得で反映。owner世代CASで重複検査〜保存の整合性を保証 |
 | 失敗 | 400入力/403owner/409Busy/500保存失敗 |
-| 冪等性・再試行 | 同外部IDで再試行。lease失効・再取得後も重複検査する |
+| 冪等性・再試行 | 同外部IDで再試行。結果不明は同じrequestIdで再送しReceiptを確認する |
 | 対応REQ | [AC-03](../../req/features/payment-event-ingestion.md#ac-03), [AC-06](../../req/features/payment-event-ingestion.md#ac-06) |
 
 <a id="pay-c04"></a>
@@ -72,7 +72,7 @@ PaymentAdapterPort、LedgerIngestionPort、CategoryClassificationPolicy/Category
 | 入出力 | `PresentIngestionResult{decision,notificationPermission} → PresentationDecision` |
 | 事前条件 | Createdはcommit済み、expenseIdが存在 |
 | 成功後の保証・変更範囲 | 許可時にcommit後通知、拒否時SnackBar。通知タップはMAN編集を開き、削除済みは今日画面の案内 |
-| 失敗 | 通知拒否はWarning。DB取得失敗はStorageFailure |
+| 失敗 | 通知拒否はWarning。API取得失敗はStorageFailure/TransportFailure |
 | 冪等性・再試行 | 重複判定結果では成功通知を増やさない |
 | 対応REQ | [AC-07](../../req/features/payment-event-ingestion.md#ac-07) |
 
@@ -82,19 +82,19 @@ SCR-002。連携設定画面にApple Payショートカットの設定ガイド�
 
 共通イベントはsourcePlatform（apple_pay）、externalTransactionId（任意）、amount（JPY整数）、currency（JPY）、merchantName（任意）、spentAt（ISO8601）、paymentMethodDetail（任意）、rawPayload（処理中のみ）。金額は共通制約。外部表記の¥・カンマ・空白を除いた数値を検証し、四則演算や不正な文字列は評価しない。時刻省略は受信時刻、指定されていて解析不能なら拒否。店舗名はメモ制約に合わせ100文字で切り、通知・ログへrawPayloadを保存しない。
 
-HTTP/URL/Shortcut adapter → NormalizePaymentHandler（ACL） → IngestPaymentHandler → LedgerIngestionPort。台帳が唯一の支出保存責務を持ち、PaymentにExpenseRepositoryの具象DBを注入しない。 同じ正規化・分類・重複判定ルールをLambda側にも実装する。Lambdaは所有者単位の条件付きロックレコード（有効期限付き）で重複検索から保存までを直列化し、競合時は再試行可能な409を返す。期限切れを再取得でき、保存後にロックを解放する。IDありはsource+externalTxIdで一意。IDなしはsource・amount・正規化店舗名が一致しspentAt差が180秒以内なら重複。重複判定・挿入・outboxを直列化した単一トランザクションで行う。
+アプリのURL AdapterはPayment APIへ入力を転送する。LambdaのNormalizePaymentHandler → IngestPaymentHandler → LedgerIngestionPortで正規化・分類・重複判定を一元化する。外部IDはsourceとの組を条件付き保存する。IDなしはowner世代を読取前後で検証し、重複検査世代が変われば再評価する。作成取引で同世代をCASし、並列取込を二重登録しない。
 
 分類は店舗名をNFKC・lowercaseし、交通（JR/東京メトロ/Suica/タクシー/ENEOS）、日用品（マツモトキヨシ/ウエルシア/ダイソー）、食費（セブン/ローソン/ファミリーマート/マクドナルド/スタバ）の順で一致する有効なカテゴリを使用する。該当カテゴリが削除済み、または一致なしなら未分類。
 
-## SPEC-02: API・通知・同期
+## SPEC-02: API・通知・再取得
 
-`/payment`はuser_idまたはx-user-id、amount、merchant、spent_at、source、external_tx_idを受け取る。GETはクエリ、POSTはJSON。同じフィールドを両方に指定した場合はPOST本文を優先。成功は200と`{status:created,expense_id}`、重複は200と`{status:duplicate,expense_id}`、不正入力は400と機械可読errorを返す。保存失敗は500、呼び出し元が再送するときは同じ外部IDを保持する。
+`/payment`はrequestId、user_idまたはx-user-id、amount、merchant、spent_at、source、external_tx_idを受け取る。GETはクエリ、POSTはJSON本文のみ。両方のowner指定が異なる場合は403。応答はSchemaのPaymentResponse（schemaVersion/requestId/status/expense_id/readGeneration）で、成功/重複とも200。共通Error形式を使い、不正入力400、owner403、競合/Busy409、保存失敗500。応答喪失は同じrequestId/外部ID/入力を保持して再送する。
 
-背景経路はLambdaでクラウドへ保存し、アプリ起動・復帰の同期でローカルへ反映する。通知はショートカットの「通知を表示」で行う。アプリ内経路は保存成功後、許可があればローカル通知、拒否ならSnackBarのみ。通知payloadはexpense_idだけとし、タップ時に該当明細の編集を開く。すでに削除済みなら案内して今日画面へ戻る。
+背景経路・アプリ内経路ともLambdaの同じ取込Handlerへ送信する。次回API取得で一覧へ反映する。背景の通知はショートカット側、アプリ内は保存成功後に許可があればOS通知、拒否ならSnackBar。通知payloadはexpense_idだけとし、タップでGetExpense API取得後に編集を開く。削除済みなら今日画面へ案内する。
 
 ## SPEC-03: 異常系・理由
 
-APIやURLの不正入力を未確定明細として保存しない。取り込み成功・重複・失敗を画面・レスポンスで区別する。ネットワークなしでは背景APIは失敗をショートカットへ返し、アプリ内のローカル記録は継続できる。アプリ自体のロック中DB書き込み・App Intentの実装を必須経路にせず、背景記録と前面起動の責務を分離する。
+APIやURLの不正入力を未確定明細として保存しない。成功・重複・失敗・結果不明を区別する。通信なしではアプリ内経路も保存せず、入力を保持する。背景経路はショートカット側に通信失敗を返す。端末内DBやロック中DB書き込みを必要としない。
 
 ## REQ対応・検証入口
 
@@ -110,4 +110,8 @@ APIやURLの不正入力を未確定明細として保存しない。取り込�
 
 ## 契約検証・実装への移行
 
-[機能別検証計画](../../verification/features/payment-event-ingestion.md)のTC-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+[機能別検証計画](../../verification/features/payment-event-ingestion.md)のTC-R3-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+
+## API版3への適用
+
+保存・参照の配置、requestId、通信失敗、Undo期限は[共通アーキテクチャ](../architecture.md)に従う。表示・ドラフトはメモリのみで、端末内DBへの保存・参照・移行を設計に含めない。HTTP公開形式は[契約一覧](../contracts/README.md)。

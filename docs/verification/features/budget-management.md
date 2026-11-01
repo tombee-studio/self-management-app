@@ -1,47 +1,56 @@
 # 予算設定・管理 検証計画
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
-- **計画日**: 2026-11-01（JST）
+- **更新日**: 2026-11-01（JST）
 
-対応: [REQ](../../req/features/budget-management.md) / [SPEC](../../spec/features/budget-management.md)。計画確定は検証済みを意味しない。結果は実装後に`docs/verification/results/budget-management.md`へ記録する。
+対応: [REQ](../../req/features/budget-management.md) / [SPEC](../../spec/features/budget-management.md)、[共通方針](../../spec/architecture.md)、[ADR-0003](../../adr/0003-cloud-api-only.md)。計画確定と実施結果を区別する。
 
 ## 範囲・前提・方法
 
-全ACを必須ケースに含む。[共通検証条件](../VERIFY.md)の固定時計・タイムゾーン・DB・ネットワーク代替を使う。単体は純粋ロジック、結合は実SQLiteとRepository、Widgetは操作と表示、APIは隔離テスト環境、実機はiOS/Androidで実施する。
+全ACと現行公開契約を必須とする。月150000円、開始1/25/28/29日、0/上限/超過の金額と配分、2月/閏年/夏時間、経過1/3/4日、未来支出。支出119999→120000→150000、通知OFF/拒否/再起動を用意する。
 
-ケースごとにDB・outbox・通知履歴を初期化する。期待値に記した全条件を満たせばPASS、相違はFAIL、環境未準備は未実施とし、必須のFAIL/未実施があれば機能完了にしない。全9機能を対象とするため、対応OS・指定範囲の検証を省略しない。外部の新決済サービス、多人公開運用は要求対象外。
+業務データは隔離AWS環境またはDynamoDB provider代替で初期化し、端末DBを使わない。固定時計・IANA TimeZone・HTTP fake・通知fakeを注入する。アプリの単体/Widget、サーバーのDomain/Handler、DynamoDB原子性、共通fixtureによるHTTP consumer/providerを分ける。実機・通知・費用の確認は該当ACで必須とし、環境未準備は未実施。
 
-## ケース
+## 受け入れケース
 
-| ケースID | 対応REQ | 対応SPEC | 入力・前提 | 手順 | 期待結果・合否基準 | 方法 |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| budget-management/TC-01 | [AC-01](../../req/features/budget-management.md#ac-01) | SPEC-01〜03 | 月間150000、開始25、配分30000、通知ON | 保存、DB再起動 | 全設定と配分を復元 | 結合 |
-| budget-management/TC-02 | [AC-02](../../req/features/budget-management.md#ac-02) | SPEC-01〜03 | 開始25、今日11/1、10/25に1000、11/24に2000、11/25に4000 | 予算期間集計 | 期間10/25〜11/24、実績3000。11/25の4000は含まない | 単体/結合 |
-| budget-management/TC-03 | [AC-03](../../req/features/budget-management.md#ac-03) | SPEC-01〜03 | 予算画面をPush/タブで開く、DB正常/失敗の各条件 | 背景/Doneを操作、保存 | 解除でき、正常はpop/今日へ移動、失敗は入力保持・遷移なし | Widget |
-| budget-management/TC-04 | [AC-04](../../req/features/budget-management.md#ac-04) | SPEC-01〜03 | 総額0/1/99999999/100000000、開始0/1/28/29、配分が総額超過 | 保存 | 金額・開始の境界を制約通り判定。配分超過は警告して保存 | 単体/Widget |
-| budget-management/TC-05 | [AC-05](../../req/features/budget-management.md#ac-05) | SPEC-01〜03 | 期間11/1〜11/30、今日11/10、予算30000、実績9000 | 目安を計算 | 残額21000、残日数21、目安1000。実績31000なら目安0・残額-1000 | 単体 |
-| budget-management/TC-06 | [AC-06](../../req/features/budget-management.md#ac-06) | SPEC-01〜03 | 11月予算30000、実績6000、今日11/3と11/4 | 予測を計算 | 11/3予測60000で警告なし、11/4予測45000で警告あり。DSTでも暦日数は同じ | 単体 |
-| budget-management/TC-07 | [AC-07](../../req/features/budget-management.md#ac-07) | SPEC-01〜03 | 予算10000、通知許可/拒否、fake notifierと通知履歴 | 実績8000→10000→再起動→10000 | 許可時80/100各1回、再起動で増えない。拒否でも明細・集計正常 | 結合/手動 |
-
-## 実行・証跡
-
-単体・結合ケースは必要なテストを実装し`flutter test test/unit`、Widgetケースは`flutter test test/widget test/widget_test.dart`で実行する。新設するテストのパスと実行対象は結果へ記録する。現存テストの成功だけで本表全件を実施済みにしない。API・E2E・実機は表の手順を実施し、要求データと応答、前後のDB状態、画面・通知の証跡を保存する。
-
-結果には対象コミット、実施日時（JSTと必要なUTC）、Flutter/Dart・OS・端末/画面幅・DB版、実測結果、判定、証跡へのリンク、不具合・再検証を記載する。端末内の実データや既存クラウドへ検証用明細を送らず、専用テスト環境を使う。
-
-## ドメイン・公開契約の検証（ARCH-01）
-
-[共通アーキテクチャ](../../spec/architecture.md)と機能書の契約を対象とする。既存TC-01以降を残し、以下のTC-CTを追加する。文書での契約定義・スキーマ例の検証をprovider/consumer実装の合格と混同しない。
-
-基準fixture: 月30000・開始25・配分、11/10実績9000、経過3/4日、80/100%の閾値とreceipt、stale Plan版を用意。
-
-| ケースID | 対応契約・要求 | 入力/前提・手順 | 合否基準 | 方法 |
+| ケースID | 対応REQ | 入力・手順 | 合否基準 | 方法 |
 | :--- | :--- | :--- | :--- | :--- |
-| budget-management/TC-CT-01 | [BUD-C01](../../spec/features/budget-management.md#bud-c01)、REQ/ARCH-01、AC-01/03/04 | 上のfixtureからConfigureBudgetPlanの正常入力と、事前条件「版一致、金額・開始日・存在するカテゴリ参照が有効」を1項目ずつ破る入力を生成。成功→同要求再送→stale版/不正入力→失敗注入の順で実行。非該当の版・書込条件はQuery/純粋Policyの副作用ゼロで確認 | 成功保証「Plan/配分/版/Outboxを一体保存。配分超過はWarning。成功後のみUI遷移」を実値/件数で確認。失敗はValidationFailed/VersionConflict/NotFound/StorageFailureと一致し、未commitなら状態/版/Outbox不変。再試行は「同値の適用済みはAlreadyApplied。失敗で画面入力を破棄しない」どおり | Domain単体＋Application/provider契約テスト。HTTP境界がある操作は共通fixtureでconsumerも検証 |
-| budget-management/TC-CT-02 | [BUD-C02](../../spec/features/budget-management.md#bud-c02)、REQ/ARCH-01、AC-02/05/06 | 上のfixtureからCalculateBudgetSummaryの正常入力と、事前条件「periodExpensesの期間がplan.resolvePeriodと一致、スナップショット世代一致」を1項目ずつ破る入力を生成。成功→同要求再送→stale版/不正入力→失敗注入の順で実行。非該当の版・書込条件はQuery/純粋Policyの副作用ゼロで確認 | 成功保証「暦日単位の残額・日次目安・予測を返す。最初3日間は予測警告なし。純粋関数」を実値/件数で確認。失敗はValidationFailed/SnapshotMismatchと一致し、未commitなら状態/版/Outbox不変。再試行は「同じ入力は同じ計算値。DB・通知に副作用なし」どおり | Domain単体＋Application/provider契約テスト。HTTP境界がある操作は共通fixtureでconsumerも検証 |
-| budget-management/TC-CT-03 | [BUD-C03](../../spec/features/budget-management.md#bud-c03)、REQ/ARCH-01、AC-07 | 上のfixtureからEvaluateBudgetThresholdsの正常入力と、事前条件「Plan版・期間・summaryの対応が一致」を1項目ずつ破る入力を生成。成功→同要求再送→stale版/不正入力→失敗注入の順で実行。非該当の版・書込条件はQuery/純粋Policyの副作用ゼロで確認 | 成功保証「periodStart/thresholdのreceiptを一度だけ確定。commit後に80/100通知を順に試み、拒否でも台帳/Planは変更しない」を実値/件数で確認。失敗はSnapshotMismatch/StorageFailure。通知拒否はWarningと一致し、未commitなら状態/版/Outbox不変。再試行は「同期間・閾値の再評価は通知を増やさない。OFF中もreceiptを残す」どおり | Domain単体＋Application/provider契約テスト。HTTP境界がある操作は共通fixtureでconsumerも検証 |
+| budget-management/TC-R3-AC-01 | [AC-01](../../req/features/budget-management.md#ac-01) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 有効な予算設定を保存し、再起動・再表示後も復元する。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
+| budget-management/TC-R3-AC-02 | [AC-02](../../req/features/budget-management.md#ac-02) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 開始日〜翌月開始日前日を1期間とし、その期間の実績から残額・日次目安を計算する。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
+| budget-management/TC-R3-AC-03 | [AC-03](../../req/features/budget-management.md#ac-03) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 背景タップ・完了操作でキーボードを閉じ、保存成功後は元画面または今日へ戻る。保存失敗時は遷移しない。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
+| budget-management/TC-R3-AC-04 | [AC-04](../../req/features/budget-management.md#ac-04) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 月間総予算は1〜99,999,999円、開始日は1〜28。カテゴリ別配分は0〜99,999,999円とし、総額超過は警告して保存を許可する。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
+| budget-management/TC-R3-AC-05 | [AC-05](../../req/features/budget-management.md#ac-05) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 残額は予算−期間実績、日次目安はmax(0,floor(残額÷当日を含む残り暦日数))とする。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
+| budget-management/TC-R3-AC-06 | [AC-06](../../req/features/budget-management.md#ac-06) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 着地予測はfloor(期間実績÷当日を含む経過暦日数×期間総暦日数)。最初の3日間は予測警告を表示しない。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
+| budget-management/TC-R3-AC-07 | [AC-07](../../req/features/budget-management.md#ac-07) | 上記fixtureの該当境界・正常/異常を実行。画面操作またはAPI要求の前後を記録し、再表示・再試行も実行 | 通知有効時に期間内で80%到達・100%到達を各1回通知し、通知拒否時も記録・集計を継続する。 不正入力は保存件数/版/イベント増分0。失敗は成功表示しない | Domain/HTTP/Widget、OS依存は両OS実機 |
 
-Portのfakeと本番adapterへ同じcontract suiteを適用する。Queryは業務DB・版・Outboxの変更回数0、Commandはcommit後に限るイベント発行を監視する。同期は部分commit契約に従いACK済みだけが残り、cursor/lastSuccessは成功条件を満たした時だけ更新されることを確認する。UI・アイコンではDB参加を要求せず、純粋Policy/ビルド契約と実機証跡を確認する。
+## 公開契約ケース
 
-追加契約テストは今回未実施。途中実装の既存テスト結果を新契約への合格証跡として流用しない。
+| ケースID | 契約 | 入力・手順 | 合否基準 | 方法 |
+| :--- | :--- | :--- | :--- | :--- |
+| budget-management/TC-R3-CT-01 | [BUD-C01](../../spec/features/budget-management.md#bud-c01) | ConfigureBudgetPlanの契約表にある正常入力→同一要求再送→各事前条件を1つずつ破る入力→commit前障害を実行。Commandは同じrequestId/異なる入力も比較、Query/純粋操作は書込監視 | 対応契約の戻り型/事後条件/エラーが一致。再送で版/イベント増分0、失敗前後の業務状態不変。純粋Policy/Queryの業務書込0 | fakeと実providerに共通fixture、公開HTTPはconsumer/provider双方 |
+| budget-management/TC-R3-CT-02 | [BUD-C02](../../spec/features/budget-management.md#bud-c02) | CalculateBudgetSummaryの契約表にある正常入力→同一要求再送→各事前条件を1つずつ破る入力→commit前障害を実行。Commandは同じrequestId/異なる入力も比較、Query/純粋操作は書込監視 | 対応契約の戻り型/事後条件/エラーが一致。再送で版/イベント増分0、失敗前後の業務状態不変。純粋Policy/Queryの業務書込0 | fakeと実providerに共通fixture、公開HTTPはconsumer/provider双方 |
+| budget-management/TC-R3-CT-03 | [BUD-C03](../../spec/features/budget-management.md#bud-c03) | EvaluateBudgetThresholdsの契約表にある正常入力→同一要求再送→各事前条件を1つずつ破る入力→commit前障害を実行。Commandは同じrequestId/異なる入力も比較、Query/純粋操作は書込監視 | 対応契約の戻り型/事後条件/エラーが一致。再送で版/イベント増分0、失敗前後の業務状態不変。純粋Policy/Queryの業務書込0 | fakeと実providerに共通fixture、公開HTTPはconsumer/provider双方 |
+
+## 旧ケースの追跡
+
+旧版のケースを改訂後の合格として流用しない。旧手順・期待値・IDはGitコミット231a698以前で保持する。今回のTC-R3は新しい期待値で再実施する。
+
+| 旧ID | 現行の対応 | 理由 |
+| :--- | :--- | :--- |
+| budget-management/TC-01 | TC-R3-AC-01 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-02 | TC-R3-AC-02 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-03 | TC-R3-AC-03 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-04 | TC-R3-AC-04 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-05 | TC-R3-AC-05 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-06 | TC-R3-AC-06 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-07 | TC-R3-AC-07 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-CT-01 | TC-R3-CT-01 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-CT-02 | TC-R3-CT-02 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+| budget-management/TC-CT-03 | TC-R3-CT-03 | ARCH-02によるAPI経由への変更。旧合格は継承しない |
+
+## 実行と結果
+
+Flutter側は`flutter test test/unit`と`flutter test test/widget test/widget_test.dart`。サーバー/HTTP/構成は実装後の対応テストコマンドとfixtureを結果文書へ記録する。既存のSQLiteテスト成功を本計画の合格にしない。APIは隔離環境、Terraformはvalidate/planで構成を確認し、この文書作業でapplyしない。
+
+結果にはコミット/作業ツリーの対象、日時、OS・SDK・環境、ケースID、期待値/実測値、PASS/FAIL/未実施、応答と前後データ・イベント・receipt・画面証跡を記録する。実データを検証で変更しない。現時点は全ケース未実施。

@@ -1,6 +1,6 @@
 # 共通UI・マルチデバイス対応 設計
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -8,7 +8,7 @@
 
 ## ドメイン境界・モデル
 
-分類: **PresentationPolicyの技術的能力（業務集約なし）**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)に従う。全契約はv1.0.0。既存REQの業務範囲・AC番号を維持する。
+分類: **PresentationPolicyの技術的能力（業務集約なし）**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)のDDD方針と[ADR-0003](../../adr/0003-cloud-api-only.md)のAWS配置に従う。全契約はv2.0.0。既存REQの業務範囲・AC番号を維持する。
 
 | モデル | 所有・構成・制約 |
 | :--- | :--- |
@@ -25,7 +25,7 @@ LayoutPolicy.resolve、NavigationController、DraftStorePort、FeatureApplicatio
 
 ### 公開契約
 
-契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DB行型を公開しない。QueryのsnapshotIdとVersionは互換ではない。
+契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DynamoDB項目型を公開しない。QueryのsnapshotIdとVersionは互換ではない。本機能の純粋Policy/ビルド契約をHTTPで公開しない。
 
 <a id="ui-c01"></a>
 #### UI-C01: ResolveLayout
@@ -79,8 +79,6 @@ Flutter/Dart、Riverpod、Materialテーマを採用し、iOS/AndroidのUI・計
 
 Flutter widgets → NavigationController + 純粋LayoutPolicy。RiverpodはComposition RootでDraftStoreと各Feature Handlerを注入し、DomainをFlutterへ依存させない。
 
-以下はPortのInfrastructure実装と計算/表示Policyの具体化。具象DB・通知SDKをDomainへ持ち込まない。複数の物理テーブルに分かれていても、上の集約境界と契約単位で保存する。
-
 
 ⌘Nは手動支出追加、⌘←/→は日次の日付変更、Escはフォームを閉じる（未保存時は破棄確認）。テキスト入力中は矢印ショートカットを無効化する。背景・Done・タブ切替でFocusを解除する。画面幅320、600、840、900と各境界直前の表示を検証する。
 
@@ -101,4 +99,8 @@ Flutter widgets → NavigationController + 純粋LayoutPolicy。RiverpodはCompo
 
 ## 契約検証・実装への移行
 
-[機能別検証計画](../../verification/features/cross-platform-shared-ui.md)のTC-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+[機能別検証計画](../../verification/features/cross-platform-shared-ui.md)のTC-R3-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+
+## API版3への適用
+
+保存・参照の配置、requestId、通信失敗、Undo期限は[共通アーキテクチャ](../architecture.md)に従う。表示・ドラフトはメモリのみで、端末内DBへの保存・参照・移行を設計に含めない。HTTP公開形式は[契約一覧](../contracts/README.md)。

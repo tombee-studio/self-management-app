@@ -1,13 +1,13 @@
 <mxfile host="app.diagrams.net" version="24.7.17" type="device">
   <diagram id="SCR-001" name="日次支出ダッシュボード">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-001  日次支出ダッシュボード" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/daily-expense-dashboard.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/daily-expense-dashboard.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/daily-expense-dashboard.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/daily-expense-dashboard.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -49,7 +49,7 @@
         <mxCell id="rule-3" value="4. 予算は家計期間、日次表示は暦日。ラベルで区別" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="466" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-4" value="5. 取得失敗は再試行。Pull失敗でもローカル表示を保持" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-4" value="5. 取得失敗は再試行。API取得失敗はメモリ内の直前表示に未更新を表示" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="558" width="870" height="80" as="geometry" />
         </mxCell>
         <mxCell id="rule-5" value="6. 840以上は左にサマリー・右に明細/編集。削除は即時＋5秒Undo" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
@@ -61,18 +61,21 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;ExpenseLedgerの読み取りモデル（CQRSのQuery側）&#10;DASH-C01, DASH-C02&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/daily-expense-dashboard.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="SCR-002" name="外部決済連携設定">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-002  外部決済連携設定" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/payment-event-ingestion.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/payment-event-ingestion.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/payment-event-ingestion.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/payment-event-ingestion.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -126,18 +129,21 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;PaymentIntegrationの腐敗防止層と台帳取り込みApplication&#10;PAY-C01, PAY-C02, PAY-C03, PAY-C04&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/payment-event-ingestion.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="SCR-003" name="マルチデバイス・画面回転レイアウト">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-003  マルチデバイス・画面回転レイアウト" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/cross-platform-shared-ui.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/cross-platform-shared-ui.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/cross-platform-shared-ui.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/cross-platform-shared-ui.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -191,18 +197,21 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;PresentationPolicyの技術的能力（業務集約なし）&#10;UI-C01, UI-C02, UI-C03&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/cross-platform-shared-ui.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="SCR-004" name="支出履歴・カレンダー一覧">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-004  支出履歴・カレンダー一覧" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/expense-history-list.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/expense-history-list.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/expense-history-list.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/expense-history-list.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -256,18 +265,21 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;ExpenseLedgerの読み取りモデル（検索・ページング）&#10;HIST-C01, HIST-C02, HIST-C03&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/expense-history-list.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="SCR-005" name="支出登録・編集モーダル">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-005  支出登録・編集モーダル" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/manual-expense-crud.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/manual-expense-crud.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/manual-expense-crud.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/manual-expense-crud.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -312,7 +324,7 @@
         <mxCell id="rule-4" value="5. 続けて入力は金額とメモだけクリア。他の指定値は保持" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="558" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-5" value="6. 明示削除は確認して即時削除。スワイプ削除のみ5秒Undo" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-5" value="6. 明示削除は確認してAPI確定後に削除。スワイプ削除のみ5秒Undo" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
         <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
@@ -321,18 +333,21 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;ExpenseLedgerの更新モデル&#10;MAN-C01, MAN-C02, MAN-C03, MAN-C04, MAN-C05&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/manual-expense-crud.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="SCR-006" name="予算設定・管理画面">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-006  予算設定・管理画面" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/budget-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/budget-management.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/budget-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/budget-management.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -377,7 +392,7 @@
         <mxCell id="rule-4" value="5. 通知は期間/閾値単位で各1回。拒否でも保存・集計継続" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="558" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-5" value="6. 背景・Done・タブでキーボード解除。DB失敗時は遷移しない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-5" value="6. 背景・Done・タブでキーボード解除。API失敗時は遷移しない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
         <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
@@ -386,18 +401,21 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;Budgetingの更新モデル・計算ポリシー&#10;BUD-C01, BUD-C02, BUD-C03&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/budget-management.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="SCR-007" name="カテゴリ管理画面">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
         <mxCell id="title" value="SCR-007  カテゴリ管理画面" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/category-master-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/category-master-management.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/category-master-management.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/category-master-management.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
@@ -451,24 +469,27 @@
         <mxCell id="contract-map" value="DDD / 契約対応&#10;CategoryCatalogの更新モデル&#10;CAT-C01, CAT-C02, CAT-C03, CAT-C04&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/category-master-management.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
         </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="SCR-008" name="クラウド同期設定画面">
-    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1100">
+  <diagram id="SCR-008" name="クラウド接続設定">
+    <mxGraphModel dx="1440" dy="1100" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1440" pageHeight="1200">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="title" value="SCR-008  クラウド同期設定画面" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="0" value="" />
+        <mxCell id="1" parent="0" value="" />
+        <mxCell id="title" value="SCR-008  クラウド接続設定" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=24;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1300" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="meta" value="v1.0.0 | done | 2026-11-01 | 現行設計: features/aws-cloud-database-sync.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/aws-cloud-database-sync.md">
+        <mxCell id="meta" value="v2.0.0 | done | 2026-11-01 | 現行設計: features/aws-cloud-database-sync.md" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1" link="features/aws-cloud-database-sync.md">
           <mxGeometry x="40" y="70" width="1300" height="30" as="geometry" />
         </mxCell>
         <mxCell id="frame" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#64748B;" vertex="1" parent="1">
           <mxGeometry x="40" y="130" width="410" height="720" as="geometry" />
         </mxCell>
-        <mxCell id="wire-0" value="状態&#10;待機 / 同期中 / 成功 / 失敗 / 最終成功日時" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="wire-0" value="状態&#10;待機 / 通信中 / 成功 / 失敗 / 最終成功日時" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="150" width="370" height="90" as="geometry" />
         </mxCell>
         <mxCell id="wire-1" value="接続先&#10;組み込みHTTPS接続先 / カスタムURL [保存]" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
@@ -477,13 +498,13 @@
         <mxCell id="wire-2" value="所有者ID&#10;固定ID:読み取り専用（認証情報ではない）" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="350" width="370" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="wire-3" value="同期操作&#10;自動同期 ON/OFF / [今すぐ同期]" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="wire-3" value="表示操作&#10;[接続確認] / [表示を再取得]" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="450" width="370" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="wire-4" value="背景記録&#10;ショートカット登録URLをコピー / 連携ガイド" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="wire-4" value="通信結果&#10;取得中・保存中・成功・失敗・結果不明 / 最終成功日時" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="550" width="370" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="wire-5" value="エラー&#10;失敗理由・ローカル保存済み・次回再送の案内" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="wire-5" value="エラー&#10;入力保持・再試行 / 結果不明は同じrequestIdで確認" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="60" y="650" width="370" height="90" as="geometry" />
         </mxCell>
         <mxCell id="navigation" value="今日  /  履歴  /  予算  /  カテゴリ" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
@@ -492,29 +513,32 @@
         <mxCell id="spec-title" value="コンポーネント仕様・業務ルール" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;fontSize=18;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="490" y="130" width="880" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="rule-0" value="1. ON時:起動/変更/復帰で同期。復帰は前回から5秒以上" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-0" value="1. 起動・変更成功・復帰でAPI再取得。復帰は前回取得開始から5秒以上" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="190" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-1" value="2. OFFは自動通信停止。手動同期は常に利用可能" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-1" value="2. 自動同期スイッチなし。明示更新で表示対象を取得" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="282" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-2" value="3. 本体変更とSyncOutboxをDBトランザクションで確定" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-2" value="3. LambdaがDynamoDBへ状態・版・Receipt・イベントを原子的に保存" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="374" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-3" value="4. Pushのrevision付きack後にPull。未送信変更は古いPullで上書きしない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-3" value="4. 競合は集約版CAS。古い版は409で入力を保持し最新版確認" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="466" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-4" value="5. 削除はtombstone、Undoは新revision。失敗時outbox保持" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-4" value="5. 応答喪失は結果不明。同じrequestIdで再送して結果確認" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="558" width="870" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="rule-5" value="6. Push/Pull両成功後だけ成功日時とカーソル更新。費用目標500円は保証ではない" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
+        <mxCell id="rule-5" value="6. 端末DB・Push/Pull・保留キュー・端末DB移行なし" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#F8FAFC;strokeColor=#CBD5E1;align=left;spacing=12;fontSize=13;" vertex="1" parent="1">
           <mxGeometry x="490" y="650" width="870" height="80" as="geometry" />
         </mxCell>
         <mxCell id="errors" value="検証結果は未実施。文書doneは実機・実装の合格を意味しない。" style="text;html=0;align=left;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="490" y="790" width="870" height="75" as="geometry" />
         </mxCell>
-        <mxCell id="contract-map" value="DDD / 契約対応&#10;Replicationの技術的支援モデル・プロセスマネージャ&#10;SYN-C01, SYN-C02, SYN-C03, SYN-C04, SYN-C05, SYN-C06, SYN-C07&#10;UIはApplication契約へ依存し、DBを直接更新しない。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/aws-cloud-database-sync.md">
+        <mxCell id="contract-map" value="契約: SYN-C08 RefreshRemoteData / SYN-C09 SendRemoteCommand / SYN-C10 ConfigureConnection / SYN-C06 ValidateCostConfiguration。端末DB・同期スイッチ・保留キューなし。" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#EEF2FF;strokeColor=#6366F1;align=left;spacing=10;fontSize=13;" vertex="1" parent="1" link="features/aws-cloud-database-sync.md">
           <mxGeometry x="490" y="900" width="870" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="cloud-api-policy" value="API版3: 業務データはAWS API経由。端末DBなし。保存は確定応答後に成功。通信失敗は入力保持、結果不明は同じrequestIdで再送。" style="text;html=0;align=left;whiteSpace=wrap;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="1300" height="55" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

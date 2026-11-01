@@ -1,138 +1,219 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "x-document-status": "done",
   "vectors": [
     {
-      "name": "支出upsert",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
+      "name": "支出登録Command",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
       "value": {
-        "expense_id": "exp-1",
-        "amount": 1280,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
-        "memo": "昼食",
-        "payment_method": "cash",
-        "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1
+        "schemaVersion": 3,
+        "requestId": "3eb6fcee-b617-4aa4-b6c9-7584562e1d91",
+        "operation": "RecordExpense",
+        "input": {
+          "id": "exp-1",
+          "amount": 1280,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食"
+        }
+      },
+      "valid": true
+    },
+    {
+      "name": "確定応答",
+      "schema": "shared.schema.json#/$defs/CommandResponse",
+      "value": {
+        "schemaVersion": 3,
+        "requestId": "3eb6fcee-b617-4aa4-b6c9-7584562e1d91",
+        "operation": "RecordExpense",
+        "value": {
+          "id": "exp-1",
+          "amount": 1280,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食",
+          "source": "manual",
+          "externalTxId": null,
+          "version": 1
+        },
+        "warnings": [],
+        "readGeneration": 1
       },
       "valid": true
     },
     {
       "name": "不正金額0",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
       "value": {
-        "expense_id": "exp-1",
-        "amount": 0,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
-        "memo": "昼食",
-        "payment_method": "cash",
-        "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1
+        "schemaVersion": 3,
+        "requestId": "3eb6fcee-b617-4aa4-b6c9-7584562e1d91",
+        "operation": "RecordExpense",
+        "input": {
+          "id": "exp-1",
+          "amount": 0,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食"
+        }
       },
       "valid": false
     },
     {
       "name": "不正金額-1",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
       "value": {
-        "expense_id": "exp-1",
-        "amount": -1,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
-        "memo": "昼食",
-        "payment_method": "cash",
-        "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1
+        "schemaVersion": 3,
+        "requestId": "3eb6fcee-b617-4aa4-b6c9-7584562e1d91",
+        "operation": "RecordExpense",
+        "input": {
+          "id": "exp-1",
+          "amount": -1,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食"
+        }
       },
       "valid": false
     },
     {
       "name": "不正金額100000000",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
       "value": {
-        "expense_id": "exp-1",
-        "amount": 100000000,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
-        "memo": "昼食",
-        "payment_method": "cash",
-        "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1
+        "schemaVersion": 3,
+        "requestId": "3eb6fcee-b617-4aa4-b6c9-7584562e1d91",
+        "operation": "RecordExpense",
+        "input": {
+          "id": "exp-1",
+          "amount": 100000000,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食"
+        }
       },
       "valid": false
     },
     {
       "name": "不正金額1.5",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
       "value": {
-        "expense_id": "exp-1",
-        "amount": 1.5,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
+        "schemaVersion": 3,
+        "requestId": "3eb6fcee-b617-4aa4-b6c9-7584562e1d91",
+        "operation": "RecordExpense",
+        "input": {
+          "id": "exp-1",
+          "amount": 1.5,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食"
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "requestIdなし",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
+      "value": {
+        "schemaVersion": 3,
+        "operation": "RecordExpense",
+        "input": {
+          "id": "exp-1",
+          "amount": 1280,
+          "categoryId": "cat_food",
+          "spentAt": "2026-11-01T03:00:00.000Z",
+          "paymentMethod": "cash",
+          "memo": "昼食"
+        }
+      },
+      "valid": false
+    },
+    {
+      "name": "旧Push拒否",
+      "schema": "shared.schema.json#/$defs/CommandRequest",
+      "value": {
+        "schema_version": 2,
+        "expenses": [],
+        "categories": [],
+        "category_budgets": []
+      },
+      "valid": false
+    },
+    {
+      "name": "カテゴリ取得",
+      "schema": "shared.schema.json#/$defs/QueryRequest",
+      "value": {
+        "schemaVersion": 3,
+        "operation": "GetCatalog",
+        "input": {}
+      },
+      "valid": true
+    },
+    {
+      "name": "履歴検索",
+      "schema": "shared.schema.json#/$defs/QueryRequest",
+      "value": {
+        "schemaVersion": 3,
+        "operation": "QueryHistory",
+        "input": {
+          "filter": {
+            "month": "2026-11",
+            "keyword": "昼食",
+            "categoryIds": [],
+            "source": null,
+            "timeZone": "Asia/Tokyo"
+          },
+          "pageSize": 50
+        }
+      },
+      "valid": true
+    },
+    {
+      "name": "余分なDB行属性拒否",
+      "schema": "shared.schema.json#/$defs/ExpenseView",
+      "value": {
+        "id": "exp-1",
+        "amount": 1280,
+        "categoryId": "cat_food",
+        "spentAt": "2026-11-01T03:00:00.000Z",
+        "paymentMethod": "cash",
         "memo": "昼食",
-        "payment_method": "cash",
         "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1
+        "externalTxId": null,
+        "version": 1,
+        "ownerId": "leak"
       },
       "valid": false
     },
     {
-      "name": "削除はID時刻revisionのみ",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
+      "name": "版競合",
+      "schema": "shared.schema.json#/$defs/Error",
       "value": {
-        "expense_id": "exp-1",
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": true,
-        "revision": 2
+        "error": "VersionConflict",
+        "retryable": false,
+        "field": "expectedVersion"
       },
       "valid": true
     },
     {
-      "name": "ACKにrevision必須",
-      "schema": "shared.schema.json#/$defs/Ack",
+      "name": "未知エラー拒否",
+      "schema": "shared.schema.json#/$defs/Error",
       "value": {
-        "entity_type": "expenses",
-        "id": "exp-1"
+        "error": "invalid_input",
+        "retryable": false
       },
       "valid": false
     },
     {
-      "name": "家計開始29日は不可",
-      "schema": "shared.schema.json#/$defs/BudgetChange",
-      "value": {
-        "budget_id": "current",
-        "monthly_amount": 1000,
-        "start_day": 29,
-        "is_category_budget_enabled": false,
-        "is_alert_notification_enabled": true,
-        "updated_at": "2026-11-01T03:00:00.000Z",
-        "is_deleted": false,
-        "revision": 1
-      },
-      "valid": false
-    },
-    {
-      "name": "正常viewport",
+      "name": "UI入力",
       "schema": "shared.schema.json#/$defs/WindowContext",
       "value": {
-        "width": 600,
-        "height": 800,
+        "width": 840,
+        "height": 1024,
         "safeInsets": [
           0,
           0,
@@ -144,112 +225,16 @@
       "valid": true
     },
     {
-      "name": "負のviewport",
-      "schema": "shared.schema.json#/$defs/WindowContext",
-      "value": {
-        "width": -1,
-        "height": 800,
-        "safeInsets": [
-          0,
-          0,
-          0,
-          0
-        ],
-        "keyboardInsets": 0
-      },
-      "valid": false
-    },
-    {
-      "name": "正常アセット",
+      "name": "アセット入力",
       "schema": "shared.schema.json#/$defs/AssetSpec",
       "value": {
         "path": "icon.png",
         "width": 1024,
         "height": 1024,
         "opaqueRequired": true,
-        "masterDigest": "digest"
+        "masterDigest": "sha256-example"
       },
       "valid": true
-    },
-    {
-      "name": "正常ドメインイベント",
-      "schema": "events.schema.json",
-      "value": {
-        "eventId": "exp-1:1:recorded",
-        "eventType": "ExpenseRecorded",
-        "schemaVersion": 1,
-        "aggregateId": "exp-1",
-        "aggregateVersion": 1,
-        "occurredAt": "2026-11-01T03:00:00.000Z",
-        "payload": {
-          "expenseId": "exp-1",
-          "amount": 1280,
-          "categoryId": "cat_food",
-          "spentAt": "2026-11-01T03:00:00.000Z",
-          "memo": "昼食"
-        }
-      },
-      "valid": true
-    },
-    {
-      "name": "rawPayloadをイベントへ漏らさない",
-      "schema": "events.schema.json",
-      "value": {
-        "eventId": "exp-1:1:recorded",
-        "eventType": "ExpenseRecorded",
-        "schemaVersion": 1,
-        "aggregateId": "exp-1",
-        "aggregateVersion": 1,
-        "occurredAt": "2026-11-01T03:00:00.000Z",
-        "payload": {
-          "expenseId": "exp-1",
-          "amount": 1280,
-          "categoryId": "cat_food",
-          "spentAt": "2026-11-01T03:00:00.000Z",
-          "memo": "昼食"
-        },
-        "rawPayload": {
-          "secret": "not_allowed"
-        }
-      },
-      "valid": false
-    },
-    {
-      "name": "nullable外部ID/メモ",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
-      "value": {
-        "expense_id": "exp-1",
-        "amount": 1280,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
-        "memo": null,
-        "payment_method": "cash",
-        "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1
-      },
-      "valid": true
-    },
-    {
-      "name": "owner/userIdは別欄へ漏らさない",
-      "schema": "shared.schema.json#/$defs/ExpenseChange",
-      "value": {
-        "expense_id": "exp-1",
-        "amount": 1280,
-        "category_id": "cat_food",
-        "spent_at": "2026-11-01T03:00:00.000Z",
-        "memo": "昼食",
-        "payment_method": "cash",
-        "source": "manual",
-        "external_tx_id": null,
-        "updated_at": "2026-11-01T03:00:00.001Z",
-        "is_deleted": false,
-        "revision": 1,
-        "user_id": "owner"
-      },
-      "valid": false
     }
   ]
 }

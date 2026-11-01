@@ -1,6 +1,6 @@
 # アプリアイコン・ブランディング 設計
 
-- **バージョン**: v1.0.0
+- **バージョン**: v2.0.0
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -8,7 +8,7 @@
 
 ## ドメイン境界・モデル
 
-分類: **BrandAssetsのビルド時技術的能力（業務集約なし）**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)に従う。全契約はv1.0.0。既存REQの業務範囲・AC番号を維持する。
+分類: **BrandAssetsのビルド時技術的能力（業務集約なし）**。[共通アーキテクチャ](../architecture.md)と[ADR-0002](../../adr/0002-domain-contract-design.md)のDDD方針と[ADR-0003](../../adr/0003-cloud-api-only.md)のAWS配置に従う。全契約はv2.0.0。既存REQの業務範囲・AC番号を維持する。
 
 | モデル | 所有・構成・制約 |
 | :--- | :--- |
@@ -18,13 +18,13 @@
 ### 不変条件・依存方向
 
 - 既存マスターを正本とし、OS間で異なる絵柄を独自生成しない。
-- アイコン検査は台帳・予算・同期DBへ依存しない。
+- アイコン検査は台帳・予算・業務保存先へ依存しない。
 
 AssetReaderPort、ImageTransformPort、BuildManifestPort。機械検査と実機の視認性確認を区別する。
 
 ### 公開契約
 
-契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DB行型を公開しない。QueryのsnapshotIdとVersionは互換ではない。
+契約の成功・失敗・版・トランザクション・再試行の共通意味は[共通規則](../architecture.md#5-契約の共通規則)。Operationの引数型は上の値型/DTOとSPEC-01の項目定義を使い、DynamoDB項目型を公開しない。QueryのsnapshotIdとVersionは互換ではない。本機能の純粋Policy/ビルド契約をHTTPで公開しない。
 
 <a id="icon-c01"></a>
 #### ICON-C01: ValidateIconManifest
@@ -70,9 +70,7 @@ iOSは`ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json`のfilename/s
 
 ## SPEC-02: 更新・検査
 
-Build task → BrandAssetService → ManifestReader/ImageTransform/AssetValidator。業務Repository・ネットワーク同期・支出の値型に依存させない。
-
-以下はPortのInfrastructure実装と計算/表示Policyの具体化。具象DB・通知SDKをDomainへ持ち込まない。複数の物理テーブルに分かれていても、上の集約境界と契約単位で保存する。
+Build task → BrandAssetService → ManifestReader/ImageTransform/AssetValidator。業務Repository・API通信・支出の値型に依存させない。
 
 変更が必要なときは既存マスターから同じモチーフを比率保持で縮小し、プラットフォーム指定寸法へ書き出す。生成方法・実行コマンド・対象ファイルは実装時の証跡へ記録する。マスターと派生PNGはリポジトリに置く。必要な寸法が未生成の場合は既定Flutterロゴで代用せず未完了として扱う。
 
@@ -91,4 +89,8 @@ Build task → BrandAssetService → ManifestReader/ImageTransform/AssetValidato
 
 ## 契約検証・実装への移行
 
-[機能別検証計画](../../verification/features/app-icon-branding.md)のTC-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+[機能別検証計画](../../verification/features/app-icon-branding.md)のTC-R3-CTで公開契約ごとの前提違反・成功保証・不変条件・失敗時副作用・再試行を検証する。既存SPEC-01〜03の業務/画面条件を契約の詳細規則として維持する。既存実装と途中の変更は移行元であり、本設計に適合済みとは扱わない。
+
+## API版3への適用
+
+アイコンはビルド時の技術的能力でありAWS API呼出し・業務データ保存を必要としない。AssetSpecと既存マスターを使い、端末DB廃止によって画像資産を削除しない。
