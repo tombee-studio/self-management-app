@@ -1,0 +1,3 @@
+PASS inclusive JPY/date/grapheme boundaries and explicit deletion without Undo
+PASS category name/icon/color/order negative boundaries preserve catalog version
+PASS budget invalid money/start/allocation/duplicates reject atomically

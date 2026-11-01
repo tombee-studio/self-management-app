@@ -1,0 +1,134 @@
+{
+  "environment": "stg",
+  "start": "2026-11-01T21:21:06.949998+00:00",
+  "end": "2026-11-01T22:21:06.949998+00:00",
+  "results": [
+    {
+      "namespace": "AWS/Lambda",
+      "metric": "Invocations",
+      "target": "iris-sync-handler-stg",
+      "statistic": "Sum",
+      "measured": 276.0,
+      "datapoints": 7,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/Lambda",
+      "metric": "Errors",
+      "target": "iris-sync-handler-stg",
+      "statistic": "Sum",
+      "measured": 14.0,
+      "datapoints": 7,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/Lambda",
+      "metric": "Duration",
+      "target": "iris-sync-handler-stg",
+      "statistic": "Average",
+      "measured": 2112.36010324452,
+      "datapoints": 7,
+      "unit": "Milliseconds"
+    },
+    {
+      "namespace": "AWS/Lambda",
+      "metric": "Duration",
+      "target": "iris-sync-handler-stg",
+      "statistic": "Maximum",
+      "measured": 8472.37,
+      "datapoints": 7,
+      "unit": "Milliseconds"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedReadCapacityUnits",
+      "target": "iris_budgets_v3_stg",
+      "statistic": "Sum",
+      "measured": 428.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedWriteCapacityUnits",
+      "target": "iris_budgets_v3_stg",
+      "statistic": "Sum",
+      "measured": 8.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedReadCapacityUnits",
+      "target": "iris_categories_v3_stg",
+      "statistic": "Sum",
+      "measured": 568.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedWriteCapacityUnits",
+      "target": "iris_categories_v3_stg",
+      "statistic": "Sum",
+      "measured": 2316.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedReadCapacityUnits",
+      "target": "iris_domain_events_v3_stg",
+      "statistic": "Sum",
+      "measured": 401.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedWriteCapacityUnits",
+      "target": "iris_domain_events_v3_stg",
+      "statistic": "Sum",
+      "measured": 742.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedReadCapacityUnits",
+      "target": "iris_expenses_v3_stg",
+      "statistic": "Sum",
+      "measured": 31484.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedWriteCapacityUnits",
+      "target": "iris_expenses_v3_stg",
+      "statistic": "Sum",
+      "measured": 1284.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedReadCapacityUnits",
+      "target": "iris_metadata_v3_stg",
+      "statistic": "Sum",
+      "measured": 1247.0,
+      "datapoints": 15,
+      "unit": "Count"
+    },
+    {
+      "namespace": "AWS/DynamoDB",
+      "metric": "ConsumedWriteCapacityUnits",
+      "target": "iris_metadata_v3_stg",
+      "statistic": "Sum",
+      "measured": 1528.0,
+      "datapoints": 15,
+      "unit": "Count"
+    }
+  ],
+  "note": "Measured usage; monthly bill/JPY target is not proven by a short staging run."
+}

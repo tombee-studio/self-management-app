@@ -1,0 +1,27 @@
+{
+  "environment": "stg",
+  "date": "2026-11-01T22:58:22.569Z",
+  "fixtureOwner": "f2fa1c12-e9b3-408b-b538-f383ae00237d",
+  "rollback": {
+    "realCommittedResponseDropped": true,
+    "remainingRows": 0,
+    "backupUnchanged": true
+  },
+  "migration": {
+    "count": 1,
+    "total": 123,
+    "ids": [
+      "legacy-expense-preserved"
+    ],
+    "categoryReference": "cat_food",
+    "allocation": 1000
+  },
+  "transactionFailure": {
+    "error": "VersionConflict",
+    "expenseVersion": 1,
+    "amount": 123,
+    "generation": 1,
+    "receipt": null,
+    "event": null
+  }
+}

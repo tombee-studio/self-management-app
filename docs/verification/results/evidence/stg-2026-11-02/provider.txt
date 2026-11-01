@@ -1,0 +1,14 @@
+PASS health / schemaVersion / owner / removed sync routes
+PASS initial catalog 9 / idempotent seed / unset plan 404
+PASS Record / same request replay / different input / persisted receipt and event
+PASS invalid money / category / dates / grapheme / extra attributes leave ledger unchanged
+PASS parallel stale-version modifications commit exactly once
+PASS swipe delete / restore same identity / expired grant / explicit no grant
+PASS payment POST/GET / currency and timestamps / external and 180-second dedup
+PASS category name normalization / protected uncategorized / reorder / configure plan
+PASS 1000-fixture category retirement / concurrent save / atomic allocation and read resolution
+PASS 121 history rows / 50-50-21 / stable totals / Unicode and literal AND-OR search / invalid cursors
+PASS budget calendar period / future expenses / three-day forecast / OFF threshold receipts
+PASS catalog capacity 150KiB guard leaves generation and stored aggregate unchanged
+PASS DynamoDB Streams event delivery / per-event consumer receipt
+Result: 13/13

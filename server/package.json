@@ -1,0 +1,16 @@
+{
+  "name": "iris-api",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "@aws-sdk/util-dynamodb": "^3.996.9"
+  }
+}

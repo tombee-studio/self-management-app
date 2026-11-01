@@ -1,0 +1,32 @@
+
+> iris-api@3.0.0 test
+> node --test test/*.test.js
+
+✔ commands enforce money, normalization, versions, immutable origin, rollback and receipts (14.325917ms)
+✔ commit followed by lost response replays original response without duplicate state (0.447917ms)
+✔ Undo uses commit deadline, same ID/content, single grant, and receipt before expiry (1.1925ms)
+✔ catalog uniqueness, protected default, complete reorder and retirement of 1000 expenses with budget (87.871584ms)
+✔ history 50/50/21, all-page totals, signed owner/filter/generation/expiry constraints and query purity (95.009083ms)
+✔ budget calendar math, future expenses, warning delay, allocations, thresholds OFF receipts (1.280542ms)
+✔ payment canonical source, normalization, exact ID and inclusive 180-second fallback, concurrent race (2.652542ms)
+✔ HTTP provider verifies owner, envelope, extra fields, no legacy endpoints and read types (0.8835ms)
+✔ query retries generation drift twice and returns Busy instead of mixed results (0.361ms)
+✔ Unicode literal AND/OR/source filters preserve unfiltered month total and local day totals (1.116625ms)
+✔ all generated consumer/provider fixtures and stored events conform to canonical schemas (3.061541ms)
+✔ notification receipt does not invalidate a ledger read snapshot (0.7955ms)
+✔ provider puts generation, aggregate, receipt and events in one conditional transaction (2.045125ms)
+✔ retirement transaction stays fixed for 1000 items, protects budget and catalog and never rewrites expenses (1.988084ms)
+✔ provider rejects catalog/plan over 150KiB without issuing a transaction (0.85725ms)
+✔ provider traverses every strongly consistent Query page and honors deadline (0.347958ms)
+✔ event v2 consumer commits effects/receipt/delivery atomically and rejects v1 (1.090166ms)
+✔ cloud import verifies totals and rolls back all target rows after an unknown transaction outcome (11.341ms)
+✔ cloud-only migration preserves IDs/count/money, repairs name collisions and leaves backup unchanged (12.853667ms)
+✔ Lambda stream adapter acknowledges committed v2 events once and ignores delivery updates (7.081834ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 265.685042

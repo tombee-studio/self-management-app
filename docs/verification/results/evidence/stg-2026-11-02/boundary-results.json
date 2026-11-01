@@ -1,0 +1,31 @@
+{
+  "environment": "stg",
+  "date": "2026-11-01T22:20:14.996Z",
+  "results": [
+    {
+      "name": "inclusive JPY/date/grapheme boundaries and explicit deletion without Undo",
+      "status": "PASS",
+      "measured": {
+        "min": 1,
+        "max": 99999999,
+        "epochAccepted": true,
+        "graphemes": 100,
+        "explicitUndo": null
+      }
+    },
+    {
+      "name": "category name/icon/color/order negative boundaries preserve catalog version",
+      "status": "PASS",
+      "measured": {
+        "catalogVersionUnchanged": 4
+      }
+    },
+    {
+      "name": "budget invalid money/start/allocation/duplicates reject atomically",
+      "status": "PASS",
+      "measured": {
+        "planVersionUnchanged": 4
+      }
+    }
+  ]
+}

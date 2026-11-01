@@ -1,0 +1,6 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {migrate}=require('../infrastructure/migration');
+test('cloud-only migration preserves IDs/count/money, repairs name collisions and leaves backup unchanged',()=>{
+ const backup={ownerId:'o',categories:[{category_id:'a',name:'ＡＢＣ',icon_key:'folder',color_hex:'#123456'},{category_id:'b',name:'abc',icon_key:'folder',color_hex:'#123456'}],expenses:[{expense_id:'e',amount:1280,category_id:'a',spent_at:'2026-11-01T00:00:00Z'}],budgets:[]};
+ const before=structuredClone(backup),r=migrate(backup,'o');assert.deepEqual(backup,before);assert.equal(r.manifest.count,1);assert.equal(r.manifest.total,1280);assert.deepEqual(r.manifest.ids,['e']);assert.equal(r.rows.find(x=>x.table==='expenses').data.categoryId,'a');assert.equal(r.rows.find(x=>x.table==='categories').data.categories.find(c=>c.id==='b').name,'abc (2)');
+ const bad=structuredClone(backup);bad.expenses[0].amount=-1;assert.throws(()=>migrate(bad,'o'));assert.deepEqual(backup,before);assert.throws(()=>migrate(backup,'other'),{code:'OwnerMismatch'});const wrong=structuredClone(backup);wrong.expenses[0].user_id='other';assert.throws(()=>migrate(wrong,'o'),{code:'OwnerMismatch'});
+});

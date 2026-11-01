@@ -1,0 +1,456 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Iris server domain events v2",
+  "x-document-status": "done",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "ExpenseRecorded"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "expenseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "amount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99999999
+            },
+            "categoryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "spentAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            "memo": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "x-graphemeMaxLength": 100
+            }
+          },
+          "required": [
+            "expenseId",
+            "amount",
+            "categoryId",
+            "spentAt",
+            "memo"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "ExpenseChanged"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "expenseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "amount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99999999
+            },
+            "categoryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "spentAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            "memo": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "x-graphemeMaxLength": 100
+            }
+          },
+          "required": [
+            "expenseId",
+            "amount",
+            "categoryId",
+            "spentAt",
+            "memo"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "ExpenseRestored"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "expenseId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "amount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99999999
+            },
+            "categoryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "spentAt": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+            },
+            "memo": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "x-graphemeMaxLength": 100
+            }
+          },
+          "required": [
+            "expenseId",
+            "amount",
+            "categoryId",
+            "spentAt",
+            "memo"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "ExpenseDeleted"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "expenseId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expenseId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "CatalogChanged"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "catalogId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "categoryIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "catalogId",
+            "categoryIds"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "CategoryRetired"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "categoryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "targetCategoryId": {
+              "const": "cat_uncategorized"
+            },
+            "movedExpenseCount": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "categoryId",
+            "targetCategoryId",
+            "movedExpenseCount"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventType": {
+          "const": "BudgetPlanChanged"
+        },
+        "schemaVersion": {
+          "const": 2
+        },
+        "aggregateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "shared.schema.json#/$defs/UtcStamp"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "budgetPlanId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "monthlyAmount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99999999
+            },
+            "startDay": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 28
+            }
+          },
+          "required": [
+            "budgetPlanId",
+            "monthlyAmount",
+            "startDay"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "eventId",
+        "eventType",
+        "schemaVersion",
+        "aggregateId",
+        "aggregateVersion",
+        "occurredAt",
+        "payload"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "x-document-version": "2.0.0",
+  "$id": "https://iris.example/contracts/events.schema.json"
+}

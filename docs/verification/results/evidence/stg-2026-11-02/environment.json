@@ -1,0 +1,12 @@
+{
+  "environment": "stg",
+  "endpoint": "https://yy51ofa3xl.execute-api.ap-northeast-1.amazonaws.com/",
+  "tables": {
+    "budgets": "iris_budgets_v3_stg",
+    "categories": "iris_categories_v3_stg",
+    "events": "iris_domain_events_v3_stg",
+    "expenses": "iris_expenses_v3_stg",
+    "metadata": "iris_metadata_v3_stg"
+  },
+  "owner": "46b15f77-76ff-4421-b105-00dbd4e0928a"
+}

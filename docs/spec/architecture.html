@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="document-version" content="1.0.0">
+<meta name="document-status" content="done">
+<title>iris — AWS API アーキテクチャ</title>
+<style>
+:root{--bg:#f5f6fa;--paper:#fff;--ink:#192238;--muted:#647088;--line:#dce2ed;--indigo:#5146cf;--blue:#2563ab;--green:#127563;--amber:#9b6616;--shadow:0 8px 30px #24345608}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.75 -apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;cursor:pointer}a{color:var(--indigo);text-underline-offset:4px}button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid #6e63e5;outline-offset:4px}header,main,footer{max-width:1320px;margin:auto;padding-left:40px;padding-right:40px}header{padding-top:42px;padding-bottom:24px}.topline{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.logo{font-size:27px;font-weight:800;letter-spacing:-1.5px;color:var(--indigo)}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--muted);font-weight:700}.badge{display:inline-block;font-size:11px;letter-spacing:.2px;padding:3px 10px;border:1px solid var(--line);border-radius:20px;background:white;color:var(--muted)}.topline .badge{margin-left:auto}h1{font-size:clamp(26px,3.4vw,42px);letter-spacing:-1px;line-height:1.4;margin:24px 0 10px}header p{margin:0;color:var(--muted);max-width:860px}.facts{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.facts span{font-size:12px;padding:4px 10px;border-radius:6px;background:#eceaf9;color:#49408f}.tabs{display:flex;gap:7px;overflow-x:auto;border-bottom:1px solid var(--line);margin:8px 0 26px;padding:0 0 12px}.tabs button{white-space:nowrap;border:0;background:transparent;padding:10px 18px;border-radius:8px;color:var(--muted);font-weight:600}.tabs button[aria-selected=true]{background:var(--ink);color:white}.panel[hidden]{display:none}.sectionhead{display:flex;gap:20px;justify-content:space-between;align-items:start;margin-bottom:18px}.sectionhead h2{font-size:21px;margin:0}.sectionhead p{margin:4px 0 0;color:var(--muted);font-size:13px}.legend{display:flex;gap:15px;font-size:11px;color:var(--muted);padding-top:8px;flex-wrap:wrap}.legend span:before{content:"";display:inline-block;width:9px;height:9px;margin-right:6px;border-radius:3px;background:var(--indigo)}.legend span:nth-child(2):before{background:var(--green)}.legend span:nth-child(3):before{background:var(--amber)}.diagram{background:var(--paper);border:1px solid var(--line);border-radius:15px;overflow:auto;box-shadow:var(--shadow)}svg{display:block;width:100%;min-width:820px;height:auto}svg text{font-family:inherit;fill:var(--ink);font-size:13px}svg .label{font-size:11px;fill:var(--muted);letter-spacing:1px}svg .title{font-weight:700;font-size:15px}svg .sub{fill:var(--muted);font-size:11px}.node{cursor:pointer}.node rect{transition:stroke .15s,filter .15s}.node:hover rect,.node.active rect{stroke:var(--indigo);stroke-width:2;filter:drop-shadow(0 3px 4px #5146cf19)}.detail{display:grid;grid-template-columns:230px 1fr;gap:20px;padding:22px 26px;background:#eeedf9;border:1px solid #dcd8f4;border-radius:12px;margin:16px 0 24px}.detail h3{font-size:16px;margin:0}.detail p{margin:0;font-size:13px;color:#4d5270}.detail small{display:block;color:var(--muted);margin-top:4px;font-size:11px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:white;border:1px solid var(--line);border-radius:12px;padding:22px;box-shadow:var(--shadow)}.card h3{font-size:16px;margin:8px 0}.card p{font-size:13px;color:var(--muted);margin:7px 0}.tag{font:11px/1.6 ui-monospace,SFMono-Regular,monospace;color:var(--indigo);background:#f0eefb;border-radius:4px;padding:3px 7px;display:inline-block}.card.green .tag{color:var(--green);background:#e8f5f0}.card.amber .tag{color:var(--amber);background:#fbf2df}.note{padding:16px 20px;border-left:3px solid var(--indigo);background:#eeedf9;color:#4e5370;margin:20px 0;font-size:13px}.module-list{margin:16px 0 0;padding:0;list-style:none}.module-list li{border-top:1px solid var(--line);padding:11px 0;font-size:13px}.module-list b{display:block;font-size:13px}.module-list small{color:var(--muted)}.flowcontrols{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:18px 0}.flowcontrols button,.print{border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);padding:8px 14px}.flowcontrols button[aria-pressed=true]{background:var(--indigo);border-color:var(--indigo);color:white}.flowcontrols .next{margin-left:auto;background:var(--ink);color:white}.stepper{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:22px 0}.step{position:relative;border:1px solid var(--line);border-radius:10px;background:white;padding:18px 14px;min-height:155px;transition:border-color .2s,background .2s}.step:not(:last-child):after{content:"→";position:absolute;right:-13px;top:52px;color:#7b8499;z-index:1;background:var(--bg);font-size:17px}.step.current{border-color:var(--indigo);background:#eeedf9;box-shadow:0 0 0 1px var(--indigo)}.step .num{font:11px ui-monospace,monospace;color:var(--indigo)}.step h3{font-size:14px;margin:10px 0 6px}.step p{margin:0;font-size:12px;color:var(--muted)}.flowdetail{min-height:100px;background:var(--ink);color:white;border-radius:12px;padding:22px 26px}.flowdetail b{display:block;font-size:16px}.flowdetail p{color:#d6dcec;font-size:13px;margin:6px 0 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}pre{overflow:auto;background:#182238;color:#dce6fb;padding:20px;border-radius:10px;font:12px/1.8 ui-monospace,SFMono-Regular,monospace;tab-size:2;margin-bottom:0}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:white}table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}th,td{padding:16px 20px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:11px;color:var(--muted);background:#f9faff}tr:last-child td{border-bottom:none}code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.9em}.atomic{display:flex;align-items:center;gap:12px;border:1px dashed var(--green);background:#eef8f4;border-radius:12px;padding:20px;margin-top:20px;flex-wrap:wrap}.atomic b{color:var(--green);margin-right:8px}.atomic span{font-size:12px;padding:5px 9px;background:white;border-radius:5px}.refs{display:flex;gap:18px;flex-wrap:wrap;font-size:12px}.muted{color:var(--muted)}footer{padding-top:28px;padding-bottom:34px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.print{font-size:12px}.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:760px){header,main,footer{padding-left:20px;padding-right:20px}header{padding-top:26px}.grid,.two{grid-template-columns:1fr}.detail{grid-template-columns:1fr;gap:8px}.sectionhead{display:block}.stepper{grid-template-columns:1fr}.step{min-height:auto;padding:14px}.step:not(:last-child):after{display:none}.tabs button{padding:9px 12px}.flowcontrols .next{margin-left:0}.topline .badge{margin-left:0}}@media print{body{background:white;font-size:12px}header,main,footer{max-width:none;padding:12px}.tabs,.print,.flowcontrols,.detail{display:none}.panel[hidden]{display:block!important}.panel{break-before:page}#overview{break-before:auto}.diagram{border:0;box-shadow:none}svg{min-width:0}.card{box-shadow:none}.stepper{grid-template-columns:repeat(5,1fr)}.step{min-height:140px}.flowdetail{background:white;color:var(--ink);border:1px solid var(--line)}.flowdetail p{color:var(--muted)}a{color:inherit}.two{grid-template-columns:1fr 1fr}footer{break-before:avoid}}
+</style>
+</head>
+<body>
+<header>
+<div class="topline"><span class="logo">iris.</span><span class="eyebrow">SYSTEM DESIGN / 2026.11.01</span><span class="badge">設計の可視化 · 実装状況とは別</span></div>
+<h1>支出管理を、AWS APIへ集約する。</h1>
+<p>画面と入力状態をアプリに、業務ルールと永続化をサーバーに。ADR-0003に基づく現在の設計を、構成・責務・処理の流れから確認できます。</p>
+<div class="facts"><span>端末DBなし</span><span>HTTP API v3</span><span>操作契約 v2.0.0</span><span>内部イベント v2</span><span>DDD ＋ 契約駆動設計</span></div>
+</header>
+<main>
+<nav class="tabs" role="tablist" aria-label="設計図の表示切り替え">
+<button type="button" id="tab-overview" role="tab" aria-selected="true" aria-controls="overview" tabindex="0">01 全体構成</button>
+<button type="button" id="tab-domains" role="tab" aria-selected="false" aria-controls="domains" tabindex="-1">02 ドメインと契約</button>
+<button type="button" id="tab-flows" role="tab" aria-selected="false" aria-controls="flows" tabindex="-1">03 保存と取得</button>
+<button type="button" id="tab-data" role="tab" aria-selected="false" aria-controls="data" tabindex="-1">04 データ構成</button>
+</nav>
+<section class="panel" id="overview" role="tabpanel" aria-labelledby="tab-overview">
+<div class="sectionhead"><div><h2>アプリからDynamoDBまで</h2><p>枠を選択すると責務を表示します。実線は呼び出し、破線はPortの実装関係です。</p></div><div class="legend"><span>アプリ / 表示</span><span>サーバー / 業務</span><span>保存 / インフラ</span></div></div>
+<div class="diagram">
+<svg viewBox="0 0 1200 650" role="img" aria-labelledby="diagram-title diagram-description">
+<title id="diagram-title">irisのアプリ、API Gateway、Lambda、DynamoDB構成図</title>
+<desc id="diagram-description">Flutter画面からApplication、HTTP Adapter、API Gatewayを経てLambdaへ。LambdaのAPI AdapterとApplicationがDomainおよびPortを利用し、DynamoDB AdapterがPortを実装して永続化する。アプリは入力と表示をメモリに保持する。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8390a6"/></marker></defs>
+<rect x="20" y="20" width="262" height="610" rx="15" fill="#f5f3ff" stroke="#dfdaf7"/><text x="40" y="50" class="label">DEVICE · iOS / Android</text>
+<rect x="476" y="20" width="396" height="610" rx="15" fill="#f0f8f5" stroke="#cfe5dc"/><text x="496" y="50" class="label">AWS LAMBDA · SERVER</text>
+<rect x="910" y="20" width="270" height="610" rx="15" fill="#fffbf2" stroke="#eddfbf"/><text x="930" y="50" class="label">DYNAMODB · PERSISTENCE</text>
+<g class="node active" data-node="ui" role="button" tabindex="0" aria-label="Flutter画面の詳細"><rect x="40" y="84" width="222" height="86" rx="9" fill="white" stroke="#d3cdef"/><text x="56" y="113" class="title">Flutter UI</text><text x="56" y="137" class="sub">今日 / 履歴 / 予算 / カテゴリ</text><text x="56" y="154" class="sub">Riverpod · 入力と表示</text></g>
+<path d="M151 170V200" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="client" role="button" tabindex="0" aria-label="アプリApplicationの詳細"><rect x="40" y="204" width="222" height="86" rx="9" fill="white" stroke="#d3cdef"/><text x="56" y="233" class="title">Application / API Port</text><text x="56" y="257" class="sub">CloudAccess · 要求状態と再試行</text><text x="56" y="274" class="sub">ドラフトとrequestIdはメモリのみ</text></g>
+<path d="M151 290V320" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="http" role="button" tabindex="0" aria-label="HTTP Infrastructureの詳細"><rect x="40" y="324" width="222" height="86" rx="9" fill="white" stroke="#d3cdef"/><text x="56" y="353" class="title">HTTP Infrastructure</text><text x="56" y="377" class="sub">DTO変換 · HTTP通信 · Error変換</text><text x="56" y="394" class="sub">API Portの実装をProviderで注入</text></g>
+<text x="42" y="464" class="title">端末の補助機能</text><text x="42" y="492" class="sub">PresentationPolicy / ナビ・レイアウト</text><text x="42" y="514" class="sub">OS通知 / 接続先などの非業務設定</text><text x="42" y="552" class="sub">BrandAssetsはビルド時に検査</text><text x="42" y="591" class="sub">業務DB・永続キャッシュ・送信キューなし</text>
+<g class="node" data-node="gateway" role="button" tabindex="0" aria-label="API Gatewayの詳細"><rect x="312" y="324" width="130" height="86" rx="10" fill="#192238" stroke="#192238"/><text x="328" y="352" style="fill:white;font-weight:700">API Gateway</text><text x="328" y="376" style="fill:#d9dfee;font-size:11px">HTTPS / HTTP API</text><text x="328" y="394" style="fill:#d9dfee;font-size:11px">公開DTOの境界</text></g>
+<path d="M262 367H308" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<path d="M442 367H458V124H491" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="api" role="button" tabindex="0" aria-label="Lambda API Adapterの詳細"><rect x="496" y="84" width="356" height="80" rx="9" fill="white" stroke="#bbdbcc"/><text x="514" y="113" class="title">API Adapter</text><text x="514" y="138" class="sub">/commands · /queries · /payment · /health</text></g>
+<path d="M674 164V187" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="application" role="button" tabindex="0" aria-label="サーバーApplicationの詳細"><rect x="496" y="192" width="356" height="80" rx="9" fill="white" stroke="#bbdbcc"/><text x="514" y="220" class="title">Application Handlers / Query Services</text><text x="514" y="245" class="sub">ユースケース · Receipt確認 · 取引の調整</text></g>
+<path d="M674 272V295" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="domain" role="button" tabindex="0" aria-label="Domainの詳細"><rect x="496" y="300" width="356" height="96" rx="9" fill="#e2f2eb" stroke="#aad0bc"/><text x="514" y="330" class="title">Domain / 集約・値・Policy</text><text x="514" y="354" class="sub">ExpenseLedger · CategoryCatalog · Budgeting</text><text x="514" y="377" class="sub">Payment ACL → LedgerIngestionPort</text></g>
+<path d="M674 396V419" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="ports" role="button" tabindex="0" aria-label="Domain所有Portの詳細"><rect x="496" y="424" width="356" height="66" rx="9" fill="white" stroke="#bbdbcc"/><text x="514" y="451" class="title">Domain-owned Ports / UnitOfWork</text><text x="514" y="474" class="sub">Repository · QueryPort · 原子的commit</text></g>
+<g class="node" data-node="adapter" role="button" tabindex="0" aria-label="DynamoDB Adapterの詳細"><rect x="496" y="532" width="356" height="72" rx="9" fill="white" stroke="#e2cc99"/><text x="514" y="560" class="title">Infrastructure / DynamoDB Adapter</text><text x="514" y="584" class="sub">AWS SDK · 条件付き取引 · 項目/DTOの変換</text></g>
+<path d="M674 532V494" stroke="#8390a6" fill="none" stroke-dasharray="5 5" marker-end="url(#arrow)"/><text x="686" y="516" class="sub">implements</text>
+<path d="M852 568H926" stroke="#8390a6" fill="none" marker-end="url(#arrow)"/>
+<g class="node" data-node="storage" role="button" tabindex="0" aria-label="DynamoDBデータの詳細"><rect x="930" y="84" width="230" height="520" rx="10" fill="white" stroke="#e2cc99"/><text x="948" y="117" class="title">業務データの保存先</text><text x="948" y="158">iris_expenses</text><text x="948" y="180" class="sub">支出 · 版 · 削除状態</text><path d="M948 201H1140" stroke="#ece4d4"/><text x="948" y="233">iris_categories</text><text x="948" y="255" class="sub">Catalog · 廃止先対応</text><path d="M948 276H1140" stroke="#ece4d4"/><text x="948" y="308">iris_budgets</text><text x="948" y="330" class="sub">BudgetPlan · 配分</text><path d="M948 351H1140" stroke="#ece4d4"/><text x="948" y="383">iris_metadata</text><text x="948" y="405" class="sub">世代 · Receipt · Undo · 通知</text><path d="M948 426H1140" stroke="#ece4d4"/><text x="948" y="458">iris_domain_events</text><text x="948" y="480" class="sub">サーバーのイベントOutbox</text><text x="948" y="536" class="sub">アクセス権限: LambdaのIAM</text><text x="948" y="560" class="sub">アプリにAWS資格情報を配布しない</text></g>
+</svg>
+</div>
+<aside class="detail" aria-live="polite"><div><h3 id="detail-title">Flutter UI</h3><small id="detail-source">アプリ / Presentation</small></div><p id="detail-body">日次ダッシュボード、履歴、支出入力、予算、カテゴリの画面を提供します。入力・選択状態・直前表示はプロセスメモリで保持し、保存の確定応答後に成功を表示します。</p></aside>
+<div class="grid"><article class="card"><span class="tag">保存先</span><h3>端末に業務DBを置かない</h3><p>アプリはAPI経由で読み書きします。通信失敗時はメモリ内の入力と直前表示を保持し、未更新と再試行を表示します。</p></article><article class="card green"><span class="tag">整合性</span><h3>サーバーで確定する</h3><p>集約版のCASで競合を検出。状態・版・読取世代・イベント・Receiptを同じ取引で保存します。</p></article><article class="card amber"><span class="tag">再送</span><h3>同じ要求IDを使う</h3><p>タイムアウトは結果不明。requestIdを変更せず再送し、確定済みならReceiptの元応答を返します。</p></article></div>
+</section>
+<section class="panel" id="domains" role="tabpanel" aria-labelledby="tab-domains" hidden>
+<div class="sectionhead"><div><h2>9機能を、責務ごとの境界へ</h2><p>業務集約はLambda側に配置。日次・履歴は支出台帳のReadModelです。</p></div></div>
+<div class="grid">
+<article class="card green"><span class="tag">SERVER / CORE</span><h3>ExpenseLedger</h3><p>Expense集約と読み取りモデル。記録・編集・削除・復元を一貫して扱います。</p><ul class="module-list"><li><b>手動支出</b><small>MAN-C01〜05 · Record / Modify / Delete / Restore / CloseDraft</small></li><li><b>日次ダッシュボード</b><small>DASH-C01〜02 · 日次サマリー / 再取得</small></li><li><b>履歴</b><small>HIST-C01〜03 · 検索 / 合計 / 日付選択</small></li></ul><p>CloseDraftと日付選択のUI状態はアプリ側に保持します。</p></article>
+<article class="card green"><span class="tag">SERVER / SUPPORT</span><h3>CategoryCatalog / Budgeting</h3><p>分類と予算はそれぞれ独立した集約です。</p><ul class="module-list"><li><b>カテゴリ</b><small>CAT-C01〜04 · Upsert / Reorder / Retire / EnsureDefaults</small></li><li><b>予算</b><small>BUD-C01〜03 · Configure / Calculate / EvaluateThresholds</small></li></ul><p>カテゴリ廃止先の恒久対応と予算配分削除を同一取引で確定し、全ReadModelで未分類へ解決します。</p></article>
+<article class="card green"><span class="tag">SERVER / INTEGRATION</span><h3>PaymentIntegration</h3><p>外部入力を正規化する腐敗防止層（ACL）。台帳が所有するPortへ保存を委譲します。</p><ul class="module-list"><li><b>決済連携</b><small>PAY-C01〜04 · Normalize / Ingest / Background API / PresentResult</small></li></ul><p>外部IDまたは記録元・金額・店舗・180秒の条件で重複判定。結果通知はアプリまたはShortcut側です。</p></article>
+<article class="card"><span class="tag">DEVICE / APPLICATION</span><h3>CloudAccess</h3><p>HTTP要求、画面再取得、接続設定、結果不明と再試行を調整する技術的能力。</p><ul class="module-list"><li><b>クラウドデータアクセス</b><small>SYN-C06 / C08〜10 · Cost / Refresh / Send / Connection</small></li></ul><p>費用構成検査はデプロイ構成側の検査です。旧Replication・Push/Pullは廃止しています。</p></article>
+<article class="card"><span class="tag">DEVICE / PURE POLICY</span><h3>PresentationPolicy</h3><p>レイアウトとナビゲーション、メモリ内の入力状態を扱います。業務集約は所有しません。</p><ul class="module-list"><li><b>共通UI</b><small>UI-C01〜03 · ResolveLayout / ReflowDraft / Navigation</small></li></ul><p>幅600 / 840でレイアウトを切り替え、リサイズ時もドラフトを維持します。</p></article>
+<article class="card amber"><span class="tag">BUILD / ASSETS</span><h3>BrandAssets</h3><p>既存マスターから配布アイコンを生成・検査するビルド時の技術的能力。</p><ul class="module-list"><li><b>アイコン</b><small>ICON-C01〜03 · Validate / Generate / Installed Review</small></li></ul><p>業務データやAWS APIへ依存しません。</p></article>
+</div>
+<div class="note">依存方向：API Adapter → Application → Domain / Domain所有Port。InfrastructureがPortを実装します。DomainはAWS SDK・Flutter・HTTP具象へ依存しません。</div>
+</section>
+<section class="panel" id="flows" role="tabpanel" aria-labelledby="tab-flows" hidden>
+<div class="sectionhead"><div><h2>保存と取得の流れ</h2><p>処理を切り替え、「次のステップ」で確定条件を確認できます。</p></div></div>
+<div class="flowcontrols"><button type="button" data-flow="command" aria-pressed="true">保存 Command</button><button type="button" data-flow="query" aria-pressed="false">取得 Query</button><button type="button" data-flow="retry" aria-pressed="false">応答喪失と再送</button><button type="button" class="next" id="next-step">次のステップ →</button></div>
+<div class="stepper" id="stepper"></div><div class="flowdetail" aria-live="polite"><b id="flow-title"></b><p id="flow-body"></p></div>
+<div class="two"><article class="card"><span class="tag">COMMAND / POST /commands</span><h3>支出登録の入力例</h3><pre id="command-example">{
+  &quot;schemaVersion&quot;: 3,
+  &quot;requestId&quot;: &quot;3eb6fcee-b617-4aa4-b6c9-7584562e1d91&quot;,
+  &quot;operation&quot;: &quot;RecordExpense&quot;,
+  &quot;input&quot;: {
+    &quot;id&quot;: &quot;exp-1&quot;,
+    &quot;amount&quot;: 1280,
+    &quot;categoryId&quot;: &quot;cat_food&quot;,
+    &quot;spentAt&quot;: &quot;2026-11-01T03:00:00.000Z&quot;,
+    &quot;paymentMethod&quot;: &quot;cash&quot;,
+    &quot;memo&quot;: &quot;昼食&quot;
+  }
+}</pre></article><article class="card green"><span class="tag">QUERY / POST /queries</span><h3>日次取得の入力例</h3><pre>{
+  "schemaVersion": 3,
+  "operation": "WatchDailySummary",
+  "input": {
+    "date": "2026-11-01",
+    "timeZone": "Asia/Tokyo"
+  }
+}</pre></article></div>
+<div class="note">スワイプ削除はAPI確定後に反映。応答受領後5秒間Undoを表示し、サーバーは削除commit後30秒未満・削除版一致・未使用のGrantで復元を許可します。</div>
+<noscript><p>JavaScriptが無効です。保存は要求ID付き送信→検証→原子的commit→確定応答→再取得、取得は世代読取→データ取得→世代再検証→DTO応答→表示の順です。</p></noscript>
+</section>
+<section class="panel" id="data" role="tabpanel" aria-labelledby="tab-data" hidden>
+<div class="sectionhead"><div><h2>DynamoDBと公開契約</h2><p>保存項目はInfrastructure内部の形式です。APIには専用DTOを返します。</p></div></div>
+<div class="tablewrap"><table><thead><tr><th>テーブル</th><th>保存する内容</th><th>主な整合性ルール</th></tr></thead><tbody>
+<tr><td><code>iris_expenses</code></td><td>支出、カテゴリ参照、金額、日時、記録元、版、削除状態</td><td>Expense単位のCAS。削除後も版と元内容を保持</td></tr>
+<tr><td><code>iris_categories</code></td><td>Catalog、有効カテゴリ、正規化名称、順序、廃止先対応、版</td><td>名称一意・未分類保護・廃止IDの再利用禁止</td></tr>
+<tr><td><code>iris_budgets</code></td><td>BudgetPlan、月予算、開始日、設定、カテゴリ配分、版</td><td>Allocationを集約内に保持。廃止時の配分削除はCatalog更新と同取引</td></tr>
+<tr><td><code>iris_metadata</code></td><td>owner世代、CommandReceipt、Undo、外部取引ID、通知receipt</td><td>冪等応答・世代検証・単回復元・重複判定</td></tr>
+<tr><td><code>iris_domain_events</code></td><td>イベントID、集約IDと版、種類、payload、発生時刻、配送状態</td><td>追記型。commit後に配送し、consumerで重複排除</td></tr>
+</tbody></table></div>
+<div class="atomic"><b>1つのサーバー取引</b><span>業務状態</span><span>集約版</span><span>readGeneration</span><span>DomainEventOutbox</span><span>CommandReceipt</span></div>
+<div class="two"><article class="card"><h3>公開HTTP API</h3><ul class="module-list"><li><code>POST /commands</code><small> — 登録・更新・削除・復元・設定</small></li><li><code>POST /queries</code><small> — 日次・履歴・予算・各Get操作</small></li><li><code>GET / POST /payment</code><small> — Shortcut・アプリからの決済取込</small></li><li><code>GET /health</code><small> — API版と稼働確認</small></li></ul></article><article class="card amber"><h3>版と運用上の前提</h3><p>HTTP schemaVersion = 3 / 操作契約 = 2.0.0 / 内部イベントschemaVersion = 2。</p><p>固定OwnerIdは識別子です。現行設計にはAPIキー・Authorizerを追加していません。単一所有者向けで、認証方式の追加は今回の設計変更の対象外です。</p><p>月500円は運用目標。取得量・保存量・実際の費用を別途検証します。</p></article></div>
+<div class="note">Queryはowner世代を取得の前後で強整合読取し、一致した場合だけ応答します。世代が変わったカーソルは409で失効し、先頭から取得し直します。</div>
+</section>
+</main>
+<footer><div><div class="refs"><a href="architecture.md">共通アーキテクチャ</a><a href="SPEC.md">設計一覧</a><a href="../adr/0003-cloud-api-only.md">ADR-0003</a><a href="contracts/openapi.json">OpenAPI</a><a href="contracts/shared.schema.json">JSON Schema</a></div><p>文書 v1.0.0 · <span id="document-status">done</span> · 2026-11-01 / 設計書の補助図。実装・デプロイ済みを意味しません。</p></div><button type="button" class="print" id="print-button">図を印刷 / PDF保存</button></footer>
+<script>
+'use strict';
+const detailData={
+ui:['Flutter UI','アプリ / Presentation','日次ダッシュボード、履歴、支出入力、予算、カテゴリの画面を提供します。入力・選択状態・直前表示はプロセスメモリで保持し、保存の確定応答後に成功を表示します。'],
+client:['Application / API Port','アプリ / CloudAccess','要求状態・ドラフト・再試行を調整します。結果不明のrequestIdと入力はセッション内だけで保持し、再起動後は自動再送せずAPIから確定データを確認します。'],
+http:['HTTP Infrastructure','アプリ / Infrastructure','API Portを実装し、DTOの変換とHTTPS通信、Error変換を担当します。端末に業務DBやDynamoDB SDK・資格情報を配置しません。'],
+gateway:['API Gateway','AWS / HTTPの入口','HTTPSの公開APIをLambdaへ接続します。固定OwnerIdは認証資格ではありません。現行設計にAPIキーやAuthorizerは追加されていません。'],
+api:['API Adapter','Lambda / 公開契約','Command・Query・Payment・Healthを受け付けます。schemaVersion=3のDTOを検証し、内部モデルに変換してApplicationへ渡します。'],
+application:['Application Handlers','Lambda / ユースケース','Receiptを確認し、Domainの処理とUnitOfWorkを調整します。Queryはサーバーで同一世代のデータを取得・集計し、専用DTOを返します。'],
+domain:['Domain / 業務ルール','Lambda / 集約とPolicy','Expense、CategoryCatalog、BudgetPlanが不変条件を保護します。決済入力はACLで正規化し、LedgerIngestionPortへ渡します。SDKやHTTPの具象に依存しません。'],
+ports:['Domain-owned Ports','Lambda / 抽象契約','Repository・QueryPort・UnitOfWorkの契約を定義します。ApplicationはPortを利用し、DynamoDB Adapterが実装します。生のDB項目を画面へ公開しません。'],
+adapter:['DynamoDB Adapter','Lambda / Infrastructure','AWS SDKを使い、集約版とowner世代を条件にTransactWriteItemsを実行します。状態・版・世代・イベント・Receiptを原子的に保存します。'],
+storage:['DynamoDB','AWS / 業務データの保存先','支出・Catalog・BudgetPlan・メタデータ・イベントを保存します。LambdaのIAMからアクセスし、アプリはAPI経由でのみ利用します。端末の同期Outboxはありません。']};
+const tabs=[...document.querySelectorAll('[role="tab"]')];
+function selectTab(tab,focus=false){tabs.forEach(t=>{const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;document.getElementById(t.getAttribute('aria-controls')).hidden=!active;});if(focus)tab.focus();}
+tabs.forEach((tab,index)=>{tab.addEventListener('click',()=>selectTab(tab));tab.addEventListener('keydown',e=>{let n;if(e.key==='ArrowRight')n=(index+1)%tabs.length;else if(e.key==='ArrowLeft')n=(index+tabs.length-1)%tabs.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=tabs.length-1;else return;e.preventDefault();selectTab(tabs[n],true);});});
+function showNode(node){document.querySelectorAll('.node').forEach(n=>n.classList.toggle('active',n===node));const d=detailData[node.dataset.node];document.getElementById('detail-title').textContent=d[0];document.getElementById('detail-source').textContent=d[1];document.getElementById('detail-body').textContent=d[2];}
+document.querySelectorAll('.node').forEach(n=>{n.addEventListener('click',()=>showNode(n));n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showNode(n);}});});
+const flowData={
+command:[['要求を送信','requestIdと入力を送る','アプリは同じrequestIdと入力を保持し、POST /commandsへ送信します。保存中は二重操作を止めます。'],['サーバーで検証','Receipt・版・業務ルール','最初にReceiptを確認。新しい要求は集約とカテゴリ参照をロードし、入力・expectedVersion・不変条件を検証します。'],['原子的にcommit','状態とメタデータを確定','業務状態・集約版・readGeneration・イベント・Receiptを同じDynamoDB取引で保存します。条件競合は409で返します。'],['確定応答を返す','この時点で保存成功','サーバー確定応答を受けて初めて成功表示・フォームを閉じる処理を行います。通知などの副作用はcommit後です。'],['画面を再取得','確定した世代以降で更新','応答のreadGeneration以降のデータを取得し、日次・履歴・予算を更新します。再取得失敗で保存成功を取り消しません。']],
+query:[['取得を開始','日付・条件・TimeZone','起動・復帰・明示更新・変更成功後にPOST /queriesを呼びます。時刻境界は指定timeZoneからUTCへ変換します。'],['世代を読む','ownerのreadGeneration','サーバーがowner世代を強整合読取します。ページ/合計は同じ世代を対象にし、集約版と混同しません。'],['データを取得','全件対象で検索・集計','ownerパーティションの全ページとCatalog・Budgetを取得し、廃止カテゴリを解決して検索・集計します。APIの50件ページだけを総額にしません。'],['世代を再検証','変更があれば再取得','取得前後の世代が一致すれば応答します。途中変更は最大2回再取得し、なお変化ならBusy。古いカーソルはCursorInvalidatedです。'],['DTOを表示','データと合計を同じ世代で','スナップショットID付きDTOを画面へ返します。Queryは業務状態・版・イベントを書き換えません。通信失敗を空一覧にしません。']],
+retry:[['要求を送信','requestIdをメモリに保持','入力と同じ要求IDをセッション内に保持します。結果不明の操作へ新しい要求IDを割り当てません。'],['サーバー確定','Receiptも同じ取引で保存','処理が確定した場合、元の応答と操作・入力の比較情報がReceiptに残ります。業務更新だけが先に確定することはありません。'],['応答を喪失','タイムアウトは結果不明','アプリは保存失敗と断定せず、入力を残して結果不明と表示します。端末の永続キューへは保存しません。'],['同じIDで再送','同じoperation・inputを使用','サーバーはReceiptを最初に確認し、確定済みなら元の応答を返します。同じrequestIdで別入力なら409です。'],['結果を確認','二重更新・イベントを防ぐ','既適用要求を再実行せず元応答を受け、必要画面を取得します。未確定なら通常処理。再起動では自動再送せずAPI取得で確認します。']]};
+let currentFlow='command',currentStep=0;
+function renderFlow(){const steps=flowData[currentFlow];const container=document.getElementById('stepper');container.replaceChildren();steps.forEach((s,i)=>{const item=document.createElement('article');item.className='step'+(i===currentStep?' current':'');const n=document.createElement('span');n.className='num';n.textContent=String(i+1).padStart(2,'0');const h=document.createElement('h3');h.textContent=s[0];const p=document.createElement('p');p.textContent=s[1];item.append(n,h,p);container.append(item);});document.getElementById('flow-title').textContent=`${currentStep+1} / 5 — ${steps[currentStep][0]}`;document.getElementById('flow-body').textContent=steps[currentStep][2];document.getElementById('next-step').textContent=currentStep===4?'最初のステップへ ↺':'次のステップ →';}
+document.querySelectorAll('[data-flow]').forEach(b=>b.addEventListener('click',()=>{currentFlow=b.dataset.flow;currentStep=0;document.querySelectorAll('[data-flow]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));renderFlow();}));
+document.getElementById('next-step').addEventListener('click',()=>{currentStep=(currentStep+1)%5;renderFlow();});
+document.getElementById('print-button').addEventListener('click',()=>window.print());
+renderFlow();
+</script>
+</body>
+</html>

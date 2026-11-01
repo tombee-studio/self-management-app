@@ -1,0 +1,15 @@
+module.iris.aws_lambda_function.sync: Modifying... [id=iris-sync-handler-stg]
+module.iris.aws_lambda_function.sync: Modifications complete after 9s [id=iris-sync-handler-stg]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+api_endpoint = "https://yy51ofa3xl.execute-api.ap-northeast-1.amazonaws.com/"
+v3_tables = {
+  "budgets" = "iris_budgets_v3_stg"
+  "categories" = "iris_categories_v3_stg"
+  "events" = "iris_domain_events_v3_stg"
+  "expenses" = "iris_expenses_v3_stg"
+  "metadata" = "iris_metadata_v3_stg"
+}

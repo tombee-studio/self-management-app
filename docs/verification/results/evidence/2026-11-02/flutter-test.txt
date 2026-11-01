@@ -1,0 +1,23 @@
+00:00 +0: loading /Users/tomoya/Documents/Services/iris-app/test/unit/cloud_access_test.dart
+00:00 +0: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate 単一の数値を正しく評価する
+00:00 +1: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate 加算・減算を正しく評価する
+00:00 +2: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate 乗除優先順位を正しく評価する
+00:00 +3: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate 全角記号（×, ÷）および空白混在を正しく正規化して評価する
+00:00 +4: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate 末尾の未完了演算子を安全に除去して評価する
+00:00 +5: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate ゼロ除算時にもクラッシュせず安全にフォールバックする
+00:00 +6: /Users/tomoya/Documents/Services/iris-app/test/unit/calculator_parser_test.dart: CalculatorParser.evaluate 上限超過は保存可能な金額へ丸めずエラーになる
+00:00 +7: /Users/tomoya/Documents/Services/iris-app/test/unit/cloud_access_test.dart: all provider command/query/payment fixtures are consumed with matching types
+00:00 +8: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 320.0 preserves selected day on resize
+00:00 +9: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 320.0 preserves selected day on resize
+00:00 +10: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 320.0 preserves selected day on resize
+00:00 +11: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 320.0 preserves selected day on resize
+00:00 +12: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 320.0 preserves selected day on resize
+00:01 +13: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 599.0 preserves selected day on resize
+00:01 +14: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 600.0 preserves selected day on resize
+00:01 +15: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 839.0 preserves selected day on resize
+00:02 +16: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 840.0 preserves selected day on resize
+00:02 +17: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: shared UI at width 900.0 preserves selected day on resize
+00:02 +18: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: failed save retains form and retry sends same command
+00:02 +19: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: budget rejects zero, preserves failed input, and returns to today after commit
+00:03 +20: /Users/tomoya/Documents/Services/iris-app/test/widget_test.dart: modal resize preserves amount and dirty close requires discard confirmation
+00:03 +21: All tests passed!

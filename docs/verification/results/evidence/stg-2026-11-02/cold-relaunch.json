@@ -1,0 +1,20 @@
+{
+  "environment": "stg",
+  "endpoint": "https://yy51ofa3xl.execute-api.ap-northeast-1.amazonaws.com/",
+  "results": [
+    {
+      "device": "0E857380-788D-4B8E-B66E-2A8305620CA8",
+      "label": "ios",
+      "firstLaunch": "com.tombee-studio.irisApp: 62695",
+      "coldRelaunch": "com.tombee-studio.irisApp: 62757",
+      "differentProcess": true
+    },
+    {
+      "device": "089A858E-80C6-4224-8B93-16128634E655",
+      "label": "ipad",
+      "firstLaunch": "com.tombee-studio.irisApp: 62819",
+      "coldRelaunch": "com.tombee-studio.irisApp: 62872",
+      "differentProcess": true
+    }
+  ]
+}
