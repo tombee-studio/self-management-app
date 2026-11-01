@@ -1,6 +1,6 @@
 # 共通アーキテクチャ: AWS APIとドメイン契約
 
-- **バージョン**: v2.0.0
+- **バージョン**: v2.0.1
 - **ステータス**: done
 - **更新日**: 2026-11-01（JST）
 
@@ -101,3 +101,9 @@ HistoryCursor/SnapshotIdはowner・条件指紋・readGeneration・最後の(spe
 [VERIFY](../verification/VERIFY.md)で依存方向、HTTP consumer/provider、DynamoDB原子性・CAS・再送・Query世代・通信なしを検証する。文書doneは実装済みを意味しない。
 
 内部PolicyのSnapshotMismatchはHTTPでCursorInvalidated、UnsupportedSourceはValidationFailedへ変換する。サーバーエラー詳細・rawPayload・SDK項目を公開しない。
+
+## HTML構成図
+
+[現在の設計を図で見る](architecture.html)。全体構成、9機能の責務、保存・取得・再送、DynamoDBの保存構造を掲載する。外部ライブラリ不要でブラウザーから開ける補助図であり、設計の正本は本書と関連機能書・契約定義とする。HTML化による要求・契約・実装の変更はない。
+
+HTML補助図レビュー: PASS。REQ/ARCH-02、ADR-0003、現行SPEC/API契約との対応を確認。4タブ・10構成要素の説明・3フロー15ステップと周回・キーボード操作をChromeで確認し、幅1440/375pxの描画を確認した。HTML ID一意性・ソースリンク・JavaScript構文を検査。外部依存なし。要求/契約/製品実装は変更していない。
